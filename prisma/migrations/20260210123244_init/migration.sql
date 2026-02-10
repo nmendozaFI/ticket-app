@@ -1,16 +1,13 @@
--- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN');
-
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
     "name" TEXT,
     "email" TEXT NOT NULL,
-    "emailVerified" BOOLEAN NOT NULL,
+    "emailVerified" BIT NOT NULL,
     "image" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "role" "UserRole" NOT NULL DEFAULT 'USER',
+    "createdAt" DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "role" NVARCHAR(MAX) NOT NULL DEFAULT 'USER' CHECK ("role" IN ('USER', 'ADMIN')),
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
