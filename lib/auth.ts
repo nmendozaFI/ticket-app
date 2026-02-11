@@ -14,7 +14,7 @@ export const auth = betterAuth({
     microsoft: {
       clientId: process.env.MICROSFOT_CLIENT_ID as string,
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET as string,
-      tenantId: "common",
+      tenantId: process.env.MICROSOFT_TENANT_ID as string,
       authority: "https://login.microsoftonline.com",
       prompt: "select_account",
     },
