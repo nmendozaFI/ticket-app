@@ -24,6 +24,7 @@ model User {
   role          UserRole  @default(USER)
   sessions      Session[]
   accounts      Account[]
+  trips         Trip[]
 
   @@map("user")
 }
@@ -74,4 +75,48 @@ model Verification {
 
   @@map("verification")
   @@index([identifier])
+}
+
+// TABLAS PARA LA APLICACION DE TICKETS 
+enum TripStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+model Trip {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  city      String
+  startDate DateTime
+  endDate   DateTime
+  project   String?     // opcional
+  notes     String?
+  status    TripStatus  @default(DRAFT)
+  totalAmount Decimal    @default(0)
+  expenses  Expense[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@map("trips")
+  @@index([userId])
+}
+
+model Expense {
+  id        String   @id @default(cuid())
+  tripId    String
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  date      DateTime
+  amount    Decimal
+  category  String?  // comida, hotel, transporte, etc.
+  vendor    String?  // opcional (restaurante, taxi...)
+  description String?
+  receiptUrl String? // imagen
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("expenses")
+  @@index([tripId])
 }

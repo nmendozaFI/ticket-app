@@ -8,6 +8,7 @@ import { User, UserRole } from "@/types";
 import { UserProvider } from "@/context/userContext";
 import Navigation from "@/components/Navigation";
 import { Toaster } from "sonner";
+import { QueryProvider } from "@/providers/QueryProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -61,8 +62,10 @@ export default async function RootLayout({
     <html lang="es" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="antialiased">
         <UserProvider initialUser={currentUser}>
-          <Navigation/>
-          {children}
+          <QueryProvider>
+            <Navigation />
+            {children}
+          </QueryProvider>
         </UserProvider>
         <Toaster position="bottom-center" richColors />
       </body>

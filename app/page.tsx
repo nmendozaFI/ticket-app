@@ -11,5 +11,5 @@ export default async function Home() {
     redirect("/auth")
   }
 
-  redirect("/dashboard")
+  redirect("/trips")
 }
