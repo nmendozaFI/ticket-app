@@ -10,7 +10,7 @@ export type User = {
 
 
 // TYPES PARA LA APP DE TICKET 
-export type TripStatus = "DRAFT" | "ACTIVE" | "COMPLETED" // Ajusta según tu enum Prisma
+export type TripStatus = "BORRADOR" | "ENVIADO" | "ARPOBADO" // Ajusta según tu enum Prisma
 
 // Trip completo
 export interface Trip {

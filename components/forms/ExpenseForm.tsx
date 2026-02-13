@@ -1,46 +1,52 @@
-// app/trips/[tripId]/expenses/ExpenseForm.tsx
-"use client"
+"use client";
 
-import * as React from "react"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import type { Expense } from "@/types"
+import * as React from "react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import type { Expense } from "@/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 type ExpenseFormValues = {
-  date: Date
-  amount: number
-  category?: string
-  vendor?: string
-  description?: string
-}
+  date: Date;
+  amount: number;
+  category?: string;
+  vendor?: string;
+  description?: string;
+};
 
 interface ExpenseFormProps {
-  initialData?: Expense
-  onSubmit: (values: ExpenseFormValues) => void
-  onCancel: () => void
+  initialData?: Expense;
+  onSubmit: (values: ExpenseFormValues) => void;
+  onCancel: () => void;
 }
 
-export default function ExpenseForm({ initialData, onSubmit, onCancel }: ExpenseFormProps) {
+export default function ExpenseForm({
+  initialData,
+  onSubmit,
+  onCancel,
+}: ExpenseFormProps) {
   const [values, setValues] = React.useState<ExpenseFormValues>({
     date: initialData ? new Date(initialData.date) : new Date(),
     amount: initialData ? Number(initialData.amount) : 0,
     category: initialData?.category || "",
     vendor: initialData?.vendor || "",
     description: initialData?.description || "",
-  })
+  });
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    const { name, value } = e.target
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) {
+    const { name, value } = e.target;
     setValues((prev) => ({
       ...prev,
       [name]: name === "amount" ? Number(value) : value,
-    }))
+    }));
   }
 
   function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    onSubmit(values)
+    e.preventDefault();
+    onSubmit(values);
   }
 
   return (
@@ -72,13 +78,25 @@ export default function ExpenseForm({ initialData, onSubmit, onCancel }: Expense
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
           <label className="text-sm font-medium">Categoría</label>
-          <Input
-            name="category"
+          <Select
             value={values.category}
-            onChange={handleChange}
-            placeholder="Comida, hotel..."
-          />
+            onValueChange={(value) =>
+              setValues((prev) => ({ ...prev, category: value }))
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecciona una categoría" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Taxi">Taxi</SelectItem>
+              <SelectItem value="Comida">Comida</SelectItem>
+              <SelectItem value="Hotel">Hotel</SelectItem>
+              <SelectItem value="Metrobus/Parking">Metrobus/Parking</SelectItem>
+              <SelectItem value="Gasolina">Gasolina</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+
         <div>
           <label className="text-sm font-medium">Proveedor</label>
           <Input
@@ -104,10 +122,8 @@ export default function ExpenseForm({ initialData, onSubmit, onCancel }: Expense
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
-        <Button type="submit">
-          Guardar
-        </Button>
+        <Button type="submit">Guardar</Button>
       </div>
     </form>
-  )
+  );
 }

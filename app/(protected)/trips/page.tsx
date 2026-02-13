@@ -1,33 +1,48 @@
+"use client";
 
-"use client"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { useTrips, useCreateTrip, useUpdateTrip } from "@/hooks/useTrips"
-import type { Trip, CreateTripDto } from "@/types"
-import TripCard from "@/components/trips/TripCard"
-import TripForm from "@/components/forms/TripForm"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useTrips, useCreateTrip, useUpdateTrip } from "@/hooks/useTrips";
+import type { Trip, CreateTripDto } from "@/types";
+import TripCard from "@/components/trips/TripCard";
+import TripForm from "@/components/forms/TripForm";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TripsPage() {
-  const { data: trips, isLoading } = useTrips()
-  const createTrip = useCreateTrip()
-  const updateTrip = useUpdateTrip()
-  
-  const [editingTrip, setEditingTrip] = useState<Trip | null>(null)
-  const [isOpen, setIsOpen] = useState(false)
+  const { data: trips, isLoading } = useTrips();
+  const createTrip = useCreateTrip();
+  const updateTrip = useUpdateTrip();
+
+  const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleSubmit = (data: CreateTripDto) => {
     if (editingTrip) {
-      updateTrip.mutate({ tripId: editingTrip.id, data })
+      updateTrip.mutate({ tripId: editingTrip.id, data });
     } else {
-      createTrip.mutate(data)
+      createTrip.mutate(data);
     }
-    setIsOpen(false)
-    setEditingTrip(null)
-  }
+    setIsOpen(false);
+    setEditingTrip(null);
+  };
 
-  if (isLoading) return <div className="p-8">Cargando viajes...</div>
+  if (isLoading)
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-56" />
+        <div className="flex justify-between items-center mb-8">
+          <div /> 
+          <Skeleton className="h-11 w-40" />
+        </div>
+      </div>
+    );
 
   return (
     <div className="max-w-7xl mx-auto p-8">
@@ -48,7 +63,10 @@ export default function TripsPage() {
             <TripForm
               initialData={editingTrip}
               onSubmit={handleSubmit}
-              onCancel={() => { setIsOpen(false); setEditingTrip(null) }}
+              onCancel={() => {
+                setIsOpen(false);
+                setEditingTrip(null);
+              }}
             />
           </DialogContent>
         </Dialog>
@@ -60,13 +78,12 @@ export default function TripsPage() {
             key={trip.id}
             tripId={trip.id}
             onEdit={(trip) => {
-              setEditingTrip(trip)
-              setIsOpen(true)
+              setEditingTrip(trip);
+              setIsOpen(true);
             }}
           />
         ))}
       </div>
     </div>
-  )
+  );
 }
-

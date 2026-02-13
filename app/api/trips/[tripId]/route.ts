@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 type Params = {
   params: Promise<{ tripId: string }>;
@@ -30,8 +30,13 @@ export async function GET(_: Request, { params }: Params) {
   return NextResponse.json(trip);
 }
 
-export async function PUT(request: Request, { params }: { params: { tripId: string } }) {
-  const { tripId } = params
+export async function PUT
+(
+  request: NextRequest,
+  { params }: { params: Promise<{ tripId: string }> }
+) 
+ {
+  const { tripId } = await params
   const body = await request.json()
 
   const trip = await prisma.trip.update({

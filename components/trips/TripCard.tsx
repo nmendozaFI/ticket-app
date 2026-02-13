@@ -23,9 +23,9 @@ export default function TripCard({ tripId, onEdit }: TripCardProps) {
 
   const getStatusVariant = (status: Trip["status"]): "default" | "secondary" | "outline" => {
     switch (status) {
-      case "DRAFT": return "outline"
-      case "ACTIVE": return "default"
-      case "COMPLETED": return "secondary"
+      case "BORRADOR": return "outline"
+      case "ENVIADO": return "default"
+      case "ARPOBADO": return "secondary"
       default: return "outline"
     }
   }
