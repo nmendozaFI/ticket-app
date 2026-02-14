@@ -5,7 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import type { Expense } from "@/types";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Label } from "../ui/label";
 
 type ExpenseFormValues = {
   date: Date;
@@ -13,6 +20,8 @@ type ExpenseFormValues = {
   category?: string;
   vendor?: string;
   description?: string;
+  invoiceNumber?: string; // ✅ NUEVO
+  paymentMethod?: string; // ✅ NUEVO
 };
 
 interface ExpenseFormProps {
@@ -32,6 +41,8 @@ export default function ExpenseForm({
     category: initialData?.category || "",
     vendor: initialData?.vendor || "",
     description: initialData?.description || "",
+    invoiceNumber: initialData?.invoiceNumber || "",
+    paymentMethod: initialData?.paymentMethod || "Tarjeta",
   });
 
   function handleChange(
@@ -105,6 +116,42 @@ export default function ExpenseForm({
             onChange={handleChange}
             placeholder="Restaurante, taxi..."
           />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="invoiceNumber">Nº Factura</Label>
+          <Input
+            name="invoiceNumber"
+            value={values.invoiceNumber}
+            onChange={handleChange}
+            placeholder="1234567890"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="paymentMethod">Método de Pago *</Label>
+          <Select
+            value={values.paymentMethod}
+            onValueChange={(value) =>
+              setValues((prev) => ({ ...prev, paymentMethod: value }))
+            }
+            required
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecciona método" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Tarjeta">Santander tarj debito</SelectItem>
+              <SelectItem value="Efectivo">Efectivo</SelectItem>
+              <SelectItem value="Transferencia">
+                Santander transferencia
+              </SelectItem>
+              <SelectItem value="Domiciliacion">
+                Santander domiciliacion
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

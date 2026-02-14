@@ -6,29 +6,36 @@ import { Button } from "@/components/ui/button";
 import { Edit3, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useTrip, useDeleteTrip } from "@/hooks/useTrips";
-import type { Trip} from "@/types";
+import type { Trip } from "@/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 interface TripCardProps {
   tripId: string;
-  onEdit: (trip: Trip) => void
+  onEdit: (trip: Trip) => void;
 }
 
 export default function TripCard({ tripId, onEdit }: TripCardProps) {
-  const { data: trip, isLoading } = useTrip(tripId)
-  const deleteTrip = useDeleteTrip()
+  const { data: trip, isLoading } = useTrip(tripId);
+  const deleteTrip = useDeleteTrip();
 
-  if (isLoading) return <div className="animate-pulse bg-gray-200 h-80 w-full max-w-sm rounded-lg" />
-  if (!trip) return null
+  if (isLoading)
+    return (
+      <div className="animate-pulse bg-gray-200 h-80 w-full max-w-sm rounded-lg" />
+    );
+  if (!trip) return null;
 
-  const getStatusVariant = (status: Trip["status"]): "default" | "secondary" | "outline" => {
+  const getStatusVariant = (
+    status: Trip["status"],
+  ): "default" | "secondary" | "outline" => {
     switch (status) {
-      case "BORRADOR": return "outline"
-      case "ENVIADO": return "default"
-      case "ARPOBADO": return "secondary"
-      default: return "outline"
+      case "PENDIENTE":
+        return "default";
+      case "APROBADO":
+        return "secondary";
+      default:
+        return "outline";
     }
-  }
+  };
 
   return (
     <Card className="w-full max-w-sm hover:shadow-lg transition-all border-2 hover:border-blue-200">
@@ -37,14 +44,16 @@ export default function TripCard({ tripId, onEdit }: TripCardProps) {
           <CardTitle className="text-lg font-bold truncate flex-1">
             {trip.city}
           </CardTitle>
-          <Badge variant={getStatusVariant(trip.status)}>
-            {trip.status}
-          </Badge>
+          <Badge variant={getStatusVariant(trip.status)}>{trip.status}</Badge>
         </div>
 
         <div className="space-y-1 text-sm text-muted-foreground">
-          <p className="flex items-center gap-1">📅 {formatDate(trip.startDate)} - {formatDate(trip.endDate)}</p>
-          {trip.project && <p className="flex items-center gap-1">💼 {trip.project}</p>}
+          <p className="flex items-center gap-1">
+            📅 {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
+          </p>
+          {trip.project && (
+            <p className="flex items-center gap-1">💼 {trip.project}</p>
+          )}
           {trip.notes && <p className="truncate italic">📝 {trip.notes}</p>}
         </div>
       </CardHeader>
@@ -67,7 +76,7 @@ export default function TripCard({ tripId, onEdit }: TripCardProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => trip && onEdit(trip)} // ✅ Callback para editar
+            onClick={() => trip && onEdit(trip)} 
             className="px-3"
           >
             <Edit3 className="w-4 h-4" />
@@ -84,5 +93,5 @@ export default function TripCard({ tripId, onEdit }: TripCardProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

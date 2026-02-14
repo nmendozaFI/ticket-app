@@ -223,7 +223,7 @@ export type TripGroupByOutputType = {
   endDate: Date
   project: string | null
   notes: string | null
-  status: $Enums.TripStatus
+  status: $Enums.TripStatus | null
   totalAmount: runtime.Decimal
   createdAt: Date
   updatedAt: Date
@@ -260,7 +260,7 @@ export type TripWhereInput = {
   endDate?: Prisma.DateTimeFilter<"Trip"> | Date | string
   project?: Prisma.StringNullableFilter<"Trip"> | string | null
   notes?: Prisma.StringNullableFilter<"Trip"> | string | null
-  status?: Prisma.EnumTripStatusFilter<"Trip"> | $Enums.TripStatus
+  status?: Prisma.EnumTripStatusNullableFilter<"Trip"> | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
@@ -276,7 +276,7 @@ export type TripOrderByWithRelationInput = {
   endDate?: Prisma.SortOrder
   project?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
-  status?: Prisma.SortOrder
+  status?: Prisma.SortOrderInput | Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -295,7 +295,7 @@ export type TripWhereUniqueInput = Prisma.AtLeast<{
   endDate?: Prisma.DateTimeFilter<"Trip"> | Date | string
   project?: Prisma.StringNullableFilter<"Trip"> | string | null
   notes?: Prisma.StringNullableFilter<"Trip"> | string | null
-  status?: Prisma.EnumTripStatusFilter<"Trip"> | $Enums.TripStatus
+  status?: Prisma.EnumTripStatusNullableFilter<"Trip"> | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
@@ -311,7 +311,7 @@ export type TripOrderByWithAggregationInput = {
   endDate?: Prisma.SortOrder
   project?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
-  status?: Prisma.SortOrder
+  status?: Prisma.SortOrderInput | Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -333,7 +333,7 @@ export type TripScalarWhereWithAggregatesInput = {
   endDate?: Prisma.DateTimeWithAggregatesFilter<"Trip"> | Date | string
   project?: Prisma.StringNullableWithAggregatesFilter<"Trip"> | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"Trip"> | string | null
-  status?: Prisma.EnumTripStatusWithAggregatesFilter<"Trip"> | $Enums.TripStatus
+  status?: Prisma.EnumTripStatusNullableWithAggregatesFilter<"Trip"> | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalWithAggregatesFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Trip"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Trip"> | Date | string
@@ -346,7 +346,7 @@ export type TripCreateInput = {
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus
+  status?: $Enums.TripStatus | null
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -362,7 +362,7 @@ export type TripUncheckedCreateInput = {
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus
+  status?: $Enums.TripStatus | null
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -376,7 +376,7 @@ export type TripUpdateInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -392,7 +392,7 @@ export type TripUncheckedUpdateInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -407,7 +407,7 @@ export type TripCreateManyInput = {
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus
+  status?: $Enums.TripStatus | null
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -420,7 +420,7 @@ export type TripUpdateManyMutationInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -434,7 +434,7 @@ export type TripUncheckedUpdateManyInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -547,8 +547,8 @@ export type TripUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.TripScalarWhereInput | Prisma.TripScalarWhereInput[]
 }
 
-export type EnumTripStatusFieldUpdateOperationsInput = {
-  set?: $Enums.TripStatus
+export type NullableEnumTripStatusFieldUpdateOperationsInput = {
+  set?: $Enums.TripStatus | null
 }
 
 export type DecimalFieldUpdateOperationsInput = {
@@ -580,7 +580,7 @@ export type TripCreateWithoutUserInput = {
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus
+  status?: $Enums.TripStatus | null
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -594,7 +594,7 @@ export type TripUncheckedCreateWithoutUserInput = {
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus
+  status?: $Enums.TripStatus | null
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -638,7 +638,7 @@ export type TripScalarWhereInput = {
   endDate?: Prisma.DateTimeFilter<"Trip"> | Date | string
   project?: Prisma.StringNullableFilter<"Trip"> | string | null
   notes?: Prisma.StringNullableFilter<"Trip"> | string | null
-  status?: Prisma.EnumTripStatusFilter<"Trip"> | $Enums.TripStatus
+  status?: Prisma.EnumTripStatusNullableFilter<"Trip"> | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
@@ -651,7 +651,7 @@ export type TripCreateWithoutExpensesInput = {
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus
+  status?: $Enums.TripStatus | null
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -666,7 +666,7 @@ export type TripUncheckedCreateWithoutExpensesInput = {
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus
+  status?: $Enums.TripStatus | null
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -695,7 +695,7 @@ export type TripUpdateWithoutExpensesInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -710,7 +710,7 @@ export type TripUncheckedUpdateWithoutExpensesInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -723,7 +723,7 @@ export type TripCreateManyUserInput = {
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus
+  status?: $Enums.TripStatus | null
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -736,7 +736,7 @@ export type TripUpdateWithoutUserInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -750,7 +750,7 @@ export type TripUncheckedUpdateWithoutUserInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -764,7 +764,7 @@ export type TripUncheckedUpdateManyWithoutUserInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -889,7 +889,7 @@ export type $TripPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     endDate: Date
     project: string | null
     notes: string | null
-    status: $Enums.TripStatus
+    status: $Enums.TripStatus | null
     totalAmount: runtime.Decimal
     createdAt: Date
     updatedAt: Date

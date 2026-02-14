@@ -1,97 +1,166 @@
-"use client"
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useUserContext } from "@/context/userContext"
-import type { CreateExpenseDto, UpdateExpenseDto } from "@/types"
+import { useUserContext } from "@/context/userContext";
+import { CreateExpenseDto, UpdateExpenseDto, Expense } from "@/types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// Expenses por trip específico (tu única ruta GET)
-export function useTripExpenses(tripId: string) {
-  const { user } = useUserContext()
-  return useQuery({
+/* ===============================
+   Obtener expenses de un trip
+================================ */
+export function useExpenses(tripId: string) {
+  const { user } = useUserContext();
+  
+  return useQuery<Expense[]>({
     queryKey: ["expenses", tripId],
     queryFn: async () => {
-      const res = await fetch(`/api/trips/${tripId}/expenses?userId=${user?.id}`, { 
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' }
-      })
-      if (!res.ok) throw new Error(`Error: ${res.status}`)
-      return res.json()
+      const res = await fetch(`/api/trips/${tripId}/expenses`, {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Error fetching expenses");
+      }
+      
+      return res.json();
     },
     enabled: !!tripId && !!user?.id,
-  })
+  });
 }
 
-// Crear expense (POST /api/trips/[tripId]/expenses)
+/* ===============================
+   Crear expense
+================================ */
 export function useCreateExpense(tripId: string) {
-  const queryClient = useQueryClient()
-  const { user } = useUserContext()
+  const queryClient = useQueryClient();
+  const { user } = useUserContext();
 
   return useMutation({
-    mutationFn: async (data: Omit<CreateExpenseDto, 'tripId'>) => {
+    mutationFn: async (data: Omit<CreateExpenseDto, "tripId">) => {
+      if (!user?.id) throw new Error("No user");
+      
       const res = await fetch(`/api/trips/${tripId}/expenses`, {
         method: "POST",
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          ...data, 
-          tripId, // Ya lo pasa la ruta
-          userId: user!.id 
-        }),
-      })
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      
       if (!res.ok) {
-        const error = await res.text()
-        throw new Error(`Error: ${res.status} - ${error}`)
+        const error = await res.json();
+        throw new Error(error.error || "Error creating expense");
       }
-      return res.json()
+      
+      return res.json();
     },
-    onSuccess: () => {
-      // Invalida este trip y todos los trips del user
-      queryClient.invalidateQueries({ queryKey: ["expenses", tripId] })
-      queryClient.invalidateQueries({ queryKey: ["trips", user!.id] })
+    onSuccess: (newExpense: Expense) => {
+      // Invalidar expenses del trip
+      queryClient.invalidateQueries({ queryKey: ["expenses", tripId] });
+      
+      // Invalidar el trip para actualizar totalAmount
+      queryClient.invalidateQueries({ queryKey: ["trip", tripId] });
+      queryClient.invalidateQueries({ queryKey: ["trips", user!.id] });
+      
+      // Actualizar cache de expenses
+      queryClient.setQueryData<Expense[]>(["expenses", tripId], (oldExpenses) => {
+        return oldExpenses ? [newExpense, ...oldExpenses] : [newExpense];
+      });
     },
-  })
+    onError: (error) => {
+      console.error("Error creating expense:", error);
+    },
+  });
 }
 
+/* ===============================
+   Editar expense
+================================ */
 export function useUpdateExpense(tripId: string) {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
+  const { user } = useUserContext();
+
   return useMutation({
-    mutationFn: async (input: { expenseId: string; data: UpdateExpenseDto }) => {
-      const res = await fetch(`/api/trips/${tripId}/expenses/${input.expenseId}`, {
+    mutationFn: async ({
+      expenseId,
+      data,
+    }: {
+      expenseId: string;
+      data: Partial<UpdateExpenseDto>;
+    }) => {
+      if (!user?.id) throw new Error("No user");
+      
+      const res = await fetch(`/api/trips/${tripId}/expenses/${expenseId}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input.data),
-      })
-      if (!res.ok) throw new Error("Error updating expense")
-      return res.json()
+        body: JSON.stringify(data),
+      });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Error updating expense");
+      }
+      
+      return res.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["expenses", tripId] })
-      queryClient.invalidateQueries({ queryKey: ["trips"] })
+    onSuccess: (updatedExpense: Expense) => {
+      // Invalidar todas las queries relacionadas
+      queryClient.invalidateQueries({ queryKey: ["expenses", tripId] });
+      queryClient.invalidateQueries({ queryKey: ["trip", tripId] });
+      queryClient.invalidateQueries({ queryKey: ["trips", user!.id] });
+      
+      // Actualizar cache
+      queryClient.setQueryData<Expense[]>(["expenses", tripId], (oldExpenses) => {
+        if (!oldExpenses) return [updatedExpense];
+        return oldExpenses.map((expense) =>
+          expense.id === updatedExpense.id ? updatedExpense : expense
+        );
+      });
     },
-  })
+    onError: (error) => {
+      console.error("Error updating expense:", error);
+    },
+  });
 }
 
-
-// Eliminar expense (DELETE /api/trips/[tripId]/expenses/[expenseId])
+/* ===============================
+   Eliminar expense
+================================ */
 export function useDeleteExpense(tripId: string) {
-  const queryClient = useQueryClient()
-  const { user } = useUserContext()
+  const queryClient = useQueryClient();
+  const { user } = useUserContext();
 
   return useMutation({
     mutationFn: async (expenseId: string) => {
+      if (!user?.id) throw new Error("No user");
+      
       const res = await fetch(`/api/trips/${tripId}/expenses/${expenseId}`, {
         method: "DELETE",
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user!.id }),
-      })
-      if (!res.ok) throw new Error("Error deleting expense")
-      return res.json()
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Error deleting expense");
+      }
+      
+      return res.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["expenses", tripId] })
-      queryClient.invalidateQueries({ queryKey: ["trips", user!.id] })
+    onSuccess: (_, expenseId) => {
+      // Invalidar queries
+      queryClient.invalidateQueries({ queryKey: ["expenses", tripId] });
+      queryClient.invalidateQueries({ queryKey: ["trip", tripId] });
+      queryClient.invalidateQueries({ queryKey: ["trips", user!.id] });
+      
+      // Actualizar cache
+      queryClient.setQueryData<Expense[]>(["expenses", tripId], (oldExpenses) => {
+        return oldExpenses ? oldExpenses.filter((exp) => exp.id !== expenseId) : [];
+      });
     },
-  })
+    onError: (error) => {
+      console.error("Error deleting expense:", error);
+    },
+  });
 }

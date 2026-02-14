@@ -24,15 +24,15 @@ export default function Navigation() {
           </Link>
 
           <nav className="flex items-center space-x-6">
-            {user && (<Link
-              href="/"
+          {user?.role === "ADMIN" && (<Link
+              href="/admin"
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive("/")
+                isActive("/admin")
                   ? "text-indigo-600 bg-indigo-50"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Inicio
+              Administracion
             </Link> )}
 
             {user && (

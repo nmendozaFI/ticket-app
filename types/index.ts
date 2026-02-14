@@ -10,22 +10,21 @@ export type User = {
 
 
 // TYPES PARA LA APP DE TICKET 
-export type TripStatus = "BORRADOR" | "ENVIADO" | "ARPOBADO" // Ajusta según tu enum Prisma
+export type TripStatus = "PENDIENTE" | "APROBADO" | "RECHAZADO"  // ✅ Corregido
 
 // Trip completo
 export interface Trip {
   id: string
   userId: string
   city: string
-  startDate: Date | string  // ✅ Prisma puede devolver string o Date
+  startDate: Date | string  
   endDate: Date | string
   project?: string | null
   notes?: string | null
   status: TripStatus
-  totalAmount: number // Decimal como number
+  totalAmount: number 
   createdAt: Date
   updatedAt: Date
-  // Relaciones (opcional, si backend las incluye)
   user?: User
   expenses?: Expense[]
 }
@@ -49,9 +48,10 @@ export interface Expense {
   vendor?: string | null
   description?: string | null
   receiptUrl?: string | null
+  invoiceNumber?: string | null  
+  paymentMethod?: string | null  
   createdAt: Date
   updatedAt: Date
-  // Relaciones
   trip?: Trip
 }
 
@@ -64,6 +64,8 @@ export interface CreateExpenseDto {
   vendor?: string
   description?: string
   receiptUrl?: string
+  invoiceNumber?: string  
+  paymentMethod?: string  
 }
 
 export interface TripFormDto {
@@ -91,4 +93,6 @@ export interface UpdateExpenseDto {
   vendor?: string
   description?: string
   receiptUrl?: string
+  invoiceNumber?: string  
+  paymentMethod?: string  
 }

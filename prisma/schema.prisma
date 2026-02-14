@@ -79,10 +79,9 @@ model Verification {
 
 // TABLAS PARA LA APLICACION DE TICKETS 
 enum TripStatus {
-  DRAFT
-  SUBMITTED
-  APPROVED
-  REJECTED
+  PENDIENTE
+  APROBADO
+  RECHAZADO
 }
 
 model Trip {
@@ -92,9 +91,9 @@ model Trip {
   city      String
   startDate DateTime
   endDate   DateTime
-  project   String?     // opcional
+  project   String?     
   notes     String?
-  status    TripStatus  @default(DRAFT)
+  status    TripStatus? @default(PENDIENTE)  
   totalAmount Decimal    @default(0)
   expenses  Expense[]
   createdAt DateTime    @default(now())
@@ -114,6 +113,8 @@ model Expense {
   vendor    String?  // opcional (restaurante, taxi...)
   description String?
   receiptUrl String? // imagen
+  invoiceNumber String?  // Nº Factura
+  paymentMethod String?  // Tarjeta, Efectivo, Transferencia, Domiciliacion
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -4,10 +4,10 @@
 import { useParams } from "next/navigation";
 import { useTrip } from "@/hooks/useTrips";
 import {
-  useTripExpenses,
   useCreateExpense,
   useUpdateExpense,
   useDeleteExpense,
+  useExpenses,
 } from "@/hooks/useExpenses";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ export default function TripExpensesPage() {
   const router = useRouter()
 
   const { data: trip } = useTrip(tripId);
-  const { data: expenses, isLoading } = useTripExpenses(tripId);
+  const { data: expenses, isLoading } = useExpenses(tripId);
   const createExpense = useCreateExpense(tripId);
   const updateExpense = useUpdateExpense(tripId);
   const deleteExpense = useDeleteExpense(tripId);

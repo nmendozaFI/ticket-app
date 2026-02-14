@@ -18,10 +18,9 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
 export const TripStatus = {
-  DRAFT: 'DRAFT',
-  SUBMITTED: 'SUBMITTED',
-  APPROVED: 'APPROVED',
-  REJECTED: 'REJECTED'
+  PENDIENTE: 'PENDIENTE',
+  APROBADO: 'APROBADO',
+  RECHAZADO: 'RECHAZADO'
 } as const
 
 export type TripStatus = (typeof TripStatus)[keyof typeof TripStatus]

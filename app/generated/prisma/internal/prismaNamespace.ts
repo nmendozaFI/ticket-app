@@ -977,6 +977,8 @@ export const ExpenseScalarFieldEnum = {
   vendor: 'vendor',
   description: 'description',
   receiptUrl: 'receiptUrl',
+  invoiceNumber: 'invoiceNumber',
+  paymentMethod: 'paymentMethod',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
