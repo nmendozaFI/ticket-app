@@ -1,8 +1,6 @@
 "use client";
 import { signOut } from "@/actions/auth-actions";
-import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
-import { Settings } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -80,8 +78,7 @@ export default function ProfilePage({ session }: { session: Session }) {
               </div>
             </div>
 
-            {/* Demo Actions */}
-            {user.role === "ADMIN" && (
+            {/* {user.role === "ADMIN" && (
               <div className="mt-8 p-6 bg-gray-50 rounded-lg">
                 <div className="flex flex-wrap gap-3">
                   <Button
@@ -89,20 +86,20 @@ export default function ProfilePage({ session }: { session: Session }) {
                     asChild
                     className="w-full bg-transparent"
                   >
-                    <Link href="/settings">
+                    <Link href="/admin">
                       <Settings className="mr-2 h-4 w-4" />
                       Configuraciones
                     </Link>
                   </Button>
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Navigation */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
-                  href="/"
+                  href={user?.role === "ADMIN" ? "/admin/dashboard" : "/dashboard"}
                   className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
                 >
                   ← Back to Home

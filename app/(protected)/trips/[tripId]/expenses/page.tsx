@@ -21,7 +21,7 @@ import { SkeletonExpenses } from "@/components/SkeletonExpenses";
 export default function TripExpensesPage() {
   const params = useParams<{ tripId: string }>();
   const tripId = params.tripId;
-  const router = useRouter()
+  const router = useRouter();
 
   const { data: trip } = useTrip(tripId);
   const { data: expenses, isLoading } = useExpenses(tripId);
@@ -32,7 +32,7 @@ export default function TripExpensesPage() {
   const [editing, setEditing] = useState<Expense | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  if (isLoading) return <SkeletonExpenses/>;
+  if (isLoading) return <SkeletonExpenses />;
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
@@ -68,6 +68,7 @@ export default function TripExpensesPage() {
           </CardHeader>
           <CardContent>
             <ExpenseForm
+              tripId={tripId}
               initialData={editing || undefined}
               onSubmit={(values) => {
                 if (editing) {

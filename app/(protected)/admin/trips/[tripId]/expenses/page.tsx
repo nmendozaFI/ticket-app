@@ -92,7 +92,10 @@ export default function AdminTripExpenses({
               )}
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant={getStatusVariant(trip.status)} className="text-sm">
+              <Badge
+                variant={getStatusVariant(trip.status)}
+                className="text-sm"
+              >
                 {trip.status}
               </Badge>
               <Select
@@ -123,7 +126,9 @@ export default function AdminTripExpenses({
             <div>
               <p className="text-sm text-muted-foreground">Usuario</p>
               <p className="font-medium">{trip.user?.name}</p>
-              <p className="text-xs text-muted-foreground">{trip.user?.email}</p>
+              <p className="text-xs text-muted-foreground">
+                {trip.user?.email}
+              </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Fechas</p>
@@ -173,7 +178,9 @@ export default function AdminTripExpenses({
                       {formatDate(expense.date)}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary">{expense.category || "-"}</Badge>
+                      <Badge variant="secondary">
+                        {expense.category || "-"}
+                      </Badge>
                     </TableCell>
                     <TableCell>{expense.vendor || "-"}</TableCell>
                     <TableCell className="text-right font-semibold">
@@ -181,6 +188,30 @@ export default function AdminTripExpenses({
                     </TableCell>
                     <TableCell className="max-w-md truncate">
                       {expense.description || "-"}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {expense.receiptUrl ? (
+                        <div className="flex gap-2 justify-center">
+                          <a
+                            href={expense.receiptUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline inline-flex items-center gap-1"
+                          >
+                            📄 Ver
+                          </a>
+
+                          <a
+                            href={expense.receiptUrl}
+                            download
+                            className="text-green-600 hover:underline inline-flex items-center gap-1"
+                          >
+                            ⬇️ Descargar
+                          </a>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
