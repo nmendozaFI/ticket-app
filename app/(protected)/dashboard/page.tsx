@@ -27,12 +27,12 @@ export default function UserDashboard() {
     <main className="flex flex-col gap-6 p-6">
       <section className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Mis viajes</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold">Mis viajes</h1>
+          <p className="text-muted-foreground text-sm">
             Resumen de tus viajes y gastos.
           </p>
         </div>
-        <Button onClick={() => router.push("/trips")}>Ver mis viajes</Button>
+        <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={() => router.push("/trips")}>Ir a mis viajes</Button>
       </section>
 
       {/* KPIs */}

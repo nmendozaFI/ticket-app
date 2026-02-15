@@ -38,7 +38,7 @@ export default function TripCard({ tripId, onEdit }: TripCardProps) {
   };
 
   return (
-    <Card className="w-full max-w-sm hover:shadow-lg transition-all border-2 hover:border-blue-200">
+    <Card className="w-full max-w-sm hover:shadow-lg transition-all border-2 hover:border-red-200">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start gap-2">
           <CardTitle className="text-lg font-bold truncate flex-1">

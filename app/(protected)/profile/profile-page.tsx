@@ -16,7 +16,7 @@ export default function ProfilePage({ session }: { session: Session }) {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-linear-to-br from-red-50 to-indigo-100">
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 pt-20">
         <div className="px-4 py-6 sm:px-0">
@@ -48,30 +48,30 @@ export default function ProfilePage({ session }: { session: Session }) {
             </div>
 
             {/* Authentication Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <h3 className="text-lg font-medium text-blue-900 mb-2">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <h3 className="text-lg font-medium text-red-900 mb-2">
                 Authentication Status
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="font-medium text-blue-700">Status:</span>
+                  <span className="font-medium text-red-700">Status:</span>
                   <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                     Authenticated
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium text-blue-700">Email:</span>
-                  <span className="ml-2 text-blue-600">{user.email}</span>
+                  <span className="font-medium text-red-700">Email:</span>
+                  <span className="ml-2 text-red-600">{user.email}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-blue-700">Role:</span>
-                  <span className="ml-2 text-blue-600">{user.role}</span>
+                  <span className="font-medium text-red-700">Role:</span>
+                  <span className="ml-2 text-red-600">{user.role}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-blue-700">
+                  <span className="font-medium text-red-700">
                     Email Verified:
                   </span>
-                  <span className="ml-2 text-blue-600">
+                  <span className="ml-2 text-red-600">
                     {user.emailVerified ? "Yes" : "No"}
                   </span>
                 </div>

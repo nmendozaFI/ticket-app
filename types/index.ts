@@ -8,6 +8,16 @@ export type User = {
   role: UserRole;
 };
 
+export interface PaginatedResponse<T> {
+  trips: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalCount: number;
+    totalPages: number;
+    hasMore: boolean;
+  };
+}
 
 // TYPES PARA LA APP DE TICKET 
 export type TripStatus = "PENDIENTE" | "APROBADO" | "RECHAZADO"  // ✅ Corregido
