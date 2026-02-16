@@ -184,7 +184,6 @@ export default function ExpenseForm({
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
             onChange={handleImageChange}
             className="hidden"
           />

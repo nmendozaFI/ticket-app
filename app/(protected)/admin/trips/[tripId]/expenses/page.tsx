@@ -204,6 +204,7 @@ export default function AdminTripExpenses({
                           <a
                             href={expense.receiptUrl}
                             download
+                            target="_blank"
                             className="text-green-600 hover:underline inline-flex items-center gap-1"
                           >
                             ⬇️ Descargar
