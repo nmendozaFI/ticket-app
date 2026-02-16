@@ -2,10 +2,10 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { createTripSchema } from "@/lib/validations";
 import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -15,19 +15,44 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const trips = await prisma.trip.findMany({
-      where: {
-        userId: session.user.id,
-      },
-      include: {
-        expenses: true,
-      },
-      orderBy: {
-        createdAt: "desc",
+    // ✅ Obtener parámetros de paginación
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "9");
+    const skip = (page - 1) * limit;
+
+    // ✅ Consulta con paginación
+    const [trips, totalCount] = await Promise.all([
+      prisma.trip.findMany({
+        where: {
+          userId: session.user.id,
+        },
+        include: {
+          expenses: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.trip.count({
+        where: {
+          userId: session.user.id,
+        },
+      }),
+    ]);
+
+    return NextResponse.json({
+      trips,
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        hasMore: skip + trips.length < totalCount,
       },
     });
-
-    return NextResponse.json(trips);
   } catch (error) {
     console.error("Error fetching trips:", error);
     return NextResponse.json(

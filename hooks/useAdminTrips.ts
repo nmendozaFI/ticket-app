@@ -1,25 +1,25 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Trip, TripStatus } from "@/types";
+import { Trip, TripStatus, PaginatedResponse } from "@/types";
 
 /* ===============================
-   Obtener todos los trips (ADMIN)
+   Obtener todos los trips (ADMIN) con paginación
 ================================ */
-export function useAdminTrips() {
-  return useQuery<Trip[]>({
-    queryKey: ["adminTrips"],
+export function useAdminTrips(page: number = 1, limit: number = 15) {
+  return useQuery<PaginatedResponse<Trip>>({
+    queryKey: ["adminTrips", page, limit],
     queryFn: async () => {
-      const res = await fetch("/api/admin/trips", {
+      const res = await fetch(`/api/admin/trips?page=${page}&limit=${limit}`, {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       });
-      
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Error fetching admin trips");
       }
-      
+
       return res.json();
     },
   });
@@ -27,22 +27,21 @@ export function useAdminTrips() {
 
 /* ===============================
    Obtener un trip específico (ADMIN)
-   ✅ Ahora usa /api/admin/trips/[tripId]
 ================================ */
 export function useAdminTrip(tripId: string) {
   return useQuery<Trip>({
     queryKey: ["adminTrip", tripId],
     queryFn: async () => {
-      const res = await fetch(`/api/admin/trips/${tripId}`, { // ✅ Ruta admin
+      const res = await fetch(`/api/admin/trips/${tripId}`, {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       });
-      
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Error fetching trip");
       }
-      
+
       return res.json();
     },
     enabled: !!tripId,
@@ -69,29 +68,19 @@ export function useUpdateTripStatus() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Error updating status");
       }
-      
+
       return res.json();
     },
     onSuccess: (updatedTrip: Trip) => {
-      // Invalidar queries
+      // Invalidar todas las páginas
       queryClient.invalidateQueries({ queryKey: ["adminTrips"] });
       queryClient.invalidateQueries({ queryKey: ["adminTrip", updatedTrip.id] });
-      queryClient.invalidateQueries({ queryKey: ["trip", updatedTrip.id] });
-      
-      // Actualizar cache
       queryClient.setQueryData<Trip>(["adminTrip", updatedTrip.id], updatedTrip);
-      
-      queryClient.setQueryData<Trip[]>(["adminTrips"], (oldTrips) => {
-        if (!oldTrips) return [updatedTrip];
-        return oldTrips.map((trip) =>
-          trip.id === updatedTrip.id ? updatedTrip : trip
-        );
-      });
     },
     onError: (error) => {
       console.error("Error updating trip status:", error);
@@ -108,11 +97,11 @@ export function useExportExcel() {
       const res = await fetch("/api/admin/export", {
         credentials: "include",
       });
-      
+
       if (!res.ok) {
         throw new Error("Error exporting Excel");
       }
-      
+
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -125,6 +114,28 @@ export function useExportExcel() {
     },
     onError: (error) => {
       console.error("Error exporting Excel:", error);
+    },
+  });
+}
+
+/* ===============================
+   Obtener TODOS los trips para stats (ADMIN)
+================================ */
+export function useAdminTripStats() {
+  return useQuery<Trip[]>({
+    queryKey: ["adminTripStats"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/trips/stats", {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Error fetching admin trip stats");
+      }
+
+      return res.json();
     },
   });
 }

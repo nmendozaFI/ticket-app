@@ -1,32 +1,43 @@
 "use client";
 
 import { useUserContext } from "@/context/userContext";
-import { CreateTripDto, UpdateTripDto, Trip } from "@/types";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { CreateTripDto, UpdateTripDto, Trip, PaginatedResponse } from "@/types";
+import {
+  useInfiniteQuery,
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 /* ===============================
-   Obtener viajes del usuario
+   Obtener viajes con paginación (INFINITE SCROLL)
 ================================ */
 export function useTrips() {
   const { user } = useUserContext();
-  
-  return useQuery<Trip[]>({
+
+  return useInfiniteQuery<PaginatedResponse<Trip>>({
     queryKey: ["trips", user?.id],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 1 }) => {
       if (!user?.id) throw new Error("No user");
-      
-      const res = await fetch("/api/trips", {
+
+      const res = await fetch(`/api/trips?page=${pageParam}&limit=9`, {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       });
-      
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Error fetching trips");
       }
-      
+
       return res.json();
     },
+    getNextPageParam: (lastPage) => {
+      return lastPage.pagination.hasMore
+        ? lastPage.pagination.page + 1
+        : undefined;
+    },
+    initialPageParam: 1,
     enabled: !!user?.id,
   });
 }
@@ -36,7 +47,7 @@ export function useTrips() {
 ================================ */
 export function useTrip(tripId: string) {
   const { user } = useUserContext();
-  
+
   return useQuery<Trip>({
     queryKey: ["trip", tripId],
     queryFn: async () => {
@@ -44,12 +55,12 @@ export function useTrip(tripId: string) {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       });
-      
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Error fetching trip");
       }
-      
+
       return res.json();
     },
     enabled: !!tripId && !!user?.id,
@@ -66,29 +77,24 @@ export function useCreateTrip() {
   return useMutation({
     mutationFn: async (data: CreateTripDto) => {
       if (!user?.id) throw new Error("No user");
-      
+
       const res = await fetch("/api/trips", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Error creating trip");
       }
-      
+
       return res.json();
     },
-    onSuccess: (newTrip: Trip) => {
-      // Invalidar lista de trips
+    onSuccess: () => {
+      // Invalidar para refrescar la lista
       queryClient.invalidateQueries({ queryKey: ["trips", user!.id] });
-      
-      // Opcionalmente, agregar el nuevo trip al cache inmediatamente
-      queryClient.setQueryData<Trip[]>(["trips", user!.id], (oldTrips) => {
-        return oldTrips ? [newTrip, ...oldTrips] : [newTrip];
-      });
     },
     onError: (error) => {
       console.error("Error creating trip:", error);
@@ -112,35 +118,25 @@ export function useUpdateTrip() {
       data: Partial<UpdateTripDto>;
     }) => {
       if (!user?.id) throw new Error("No user");
-      
+
       const res = await fetch(`/api/trips/${tripId}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Error updating trip");
       }
-      
+
       return res.json();
     },
     onSuccess: (updatedTrip: Trip) => {
-      // Invalidar queries relacionadas
       queryClient.invalidateQueries({ queryKey: ["trips", user!.id] });
       queryClient.invalidateQueries({ queryKey: ["trip", updatedTrip.id] });
-      
-      // Actualizar cache inmediatamente
       queryClient.setQueryData<Trip>(["trip", updatedTrip.id], updatedTrip);
-      
-      queryClient.setQueryData<Trip[]>(["trips", user!.id], (oldTrips) => {
-        if (!oldTrips) return [updatedTrip];
-        return oldTrips.map((trip) =>
-          trip.id === updatedTrip.id ? updatedTrip : trip
-        );
-      });
     },
     onError: (error) => {
       console.error("Error updating trip:", error);
@@ -158,33 +154,53 @@ export function useDeleteTrip() {
   return useMutation({
     mutationFn: async (tripId: string) => {
       if (!user?.id) throw new Error("No user");
-      
+
       const res = await fetch(`/api/trips/${tripId}`, {
         method: "DELETE",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       });
-      
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Error deleting trip");
       }
-      
+
       return res.json();
     },
     onSuccess: (_, tripId) => {
-      // Invalidar lista
       queryClient.invalidateQueries({ queryKey: ["trips", user!.id] });
-      
-      // Remover del cache
       queryClient.removeQueries({ queryKey: ["trip", tripId] });
-      
-      queryClient.setQueryData<Trip[]>(["trips", user!.id], (oldTrips) => {
-        return oldTrips ? oldTrips.filter((trip) => trip.id !== tripId) : [];
-      });
     },
     onError: (error) => {
       console.error("Error deleting trip:", error);
     },
+  });
+}
+
+/* ===============================
+   Obtener TODAS las trips para stats (sin paginación)
+================================ */
+export function useTripStats() {
+  const { user } = useUserContext();
+
+  return useQuery<Trip[]>({
+    queryKey: ["tripStats", user?.id],
+    queryFn: async () => {
+      if (!user?.id) throw new Error("No user");
+
+      const res = await fetch("/api/trips/stats", {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Error fetching trip stats");
+      }
+
+      return res.json();
+    },
+    enabled: !!user?.id,
   });
 }
