@@ -66,9 +66,9 @@ export default function AdminDashboard() {
         <h1 className="text-3xl font-bold">Dashboard Administrador</h1>
         <Button
           variant="outline"
-          onClick={() => router.push("/admin")}
+          onClick={() => router.push("/trips")}
         >
-          Ver todos los viajes
+          Ver mis viajes
         </Button>
       </section>
 
