@@ -90,6 +90,7 @@ export default function AuthClientPage() {
                 ? "Inicia sesión para continuar"
                 : "Registrate para comenzar"}
             </p>
+            <p>ESTO ES COMO ERA ANTES (HAY QEU CAMBIAR DB para que sea igual a shcema prisma)</p>
           </div>
 
           {/* Error Display */}
