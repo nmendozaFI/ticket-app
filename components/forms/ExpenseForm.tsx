@@ -45,12 +45,12 @@ export default function ExpenseForm({
   const ocrMutation = useOCR();
   const uploadMutation = useUploadReceipt();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-// ✅ Estado separado para preview y URL guardada
+  // ✅ Estado separado para preview y URL guardada
   const [receiptUrl, setReceiptUrl] = React.useState<string>(
-    initialData?.receiptUrl || ""
+    initialData?.receiptUrl || "",
   );
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(
-    initialData?.receiptUrl || null
+    initialData?.receiptUrl || null,
   );
 
   const [values, setValues] = React.useState<ExpenseFormValues>({
@@ -108,7 +108,7 @@ export default function ExpenseForm({
         image: file,
         tripId,
       });
-       // 3. Actualizar estados
+      // 3. Actualizar estados
       setReceiptUrl(imageUrl);
       setPreviewUrl(imageUrl);
 
@@ -131,7 +131,7 @@ export default function ExpenseForm({
     }
   }
 
-    function handleRemoveImage() {
+  function handleRemoveImage() {
     setPreviewUrl(null);
     setReceiptUrl("");
     setValues((prev) => ({ ...prev, receiptUrl: "" }));
@@ -144,7 +144,7 @@ export default function ExpenseForm({
     e.preventDefault();
     onSubmit({
       ...values,
-      receiptUrl: receiptUrl, 
+      receiptUrl: receiptUrl,
     });
   }
 
@@ -168,7 +168,7 @@ export default function ExpenseForm({
             onClick={() => fileInputRef.current?.click()}
             disabled={isProcessing}
           >
-           {isProcessing ? (
+            {isProcessing ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Procesando...
@@ -196,6 +196,7 @@ export default function ExpenseForm({
                 src={previewUrl}
                 alt="Recibo"
                 fill
+                sizes="s"
                 className="object-contain"
                 unoptimized={!previewUrl.startsWith("http")} // ✅ Solo optimizar URLs de Cloudinary
               />
@@ -209,7 +210,11 @@ export default function ExpenseForm({
                   className="flex-1"
                   asChild
                 >
-                  <a href={receiptUrl} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={receiptUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <ExternalLink className="w-4 h-4 mr-2" />
                     Ver Original
                   </a>
@@ -273,6 +278,8 @@ export default function ExpenseForm({
               <SelectItem value="Hotel">Hotel</SelectItem>
               <SelectItem value="Metrobus/Parking">Metrobus/Parking</SelectItem>
               <SelectItem value="Gasolina">Gasolina</SelectItem>
+              <SelectItem value="Ave">Ave</SelectItem>
+              <SelectItem value="Avion">Avion</SelectItem>
             </SelectContent>
           </Select>
         </div>

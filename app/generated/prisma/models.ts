@@ -9,9 +9,10 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User'
+export type * from './models/Trip'
+export type * from './models/TripAssignment'
+export type * from './models/Expense'
 export type * from './models/Session'
 export type * from './models/Account'
 export type * from './models/Verification'
-export type * from './models/Trip'
-export type * from './models/Expense'
 export type * from './commonInputTypes'

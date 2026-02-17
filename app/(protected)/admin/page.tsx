@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useAdminTrips, useUpdateTripStatus, useExportExcel } from "@/hooks/useAdminTrips";
+import {
+  useAdminTripsTable,
+  useUpdateTripStatus,
+  useExportExcel,
+} from "@/hooks/useAdminTrips";
 import {
   Table,
   TableBody,
@@ -23,13 +27,24 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { Trip, TripStatus } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileSpreadsheet, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  FileSpreadsheet,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  X,
+} from "lucide-react";
+import { useUsers } from "@/hooks/useUser";
 
 export default function AdminPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 15;
-  
-  const { data, isLoading } = useAdminTrips(currentPage, limit);
+
+  const [filterUserId, setFilterUserId] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<TripStatus | "">("");
+
+  const { data, isLoading } = useAdminTripsTable(currentPage, limit);
+  const { users } = useUsers();
   const updateStatus = useUpdateTripStatus();
   const exportExcel = useExportExcel();
 
@@ -52,45 +67,135 @@ export default function AdminPage() {
     return (
       <div className="max-w-7xl mx-auto p-8 space-y-6">
         <Skeleton className="h-10 w-96" />
-        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-96 w-full" />
       </div>
     );
   }
 
-  const trips = data?.trips || [];
+  let trips = data?.trips ?? [];
   const pagination = data?.pagination;
+
+  if (filterUserId) {
+    trips = trips.filter((t) =>
+      t.assignedUsers?.some((a) => a.userId === filterUserId),
+    );
+  }
+  if (filterStatus) {
+    trips = trips.filter((t) => t.status === filterStatus);
+  }
+
+  // Usuarios disponibles para filtrar (solo USERs)
+  const availableUsers = users?.filter((u) => u.role === "USER") ?? [];
 
   return (
     <div className="max-w-7xl mx-auto p-8 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-4xl font-bold">Admin - Todos los Viajes</h1>
+          <h1 className="text-4xl font-bold">Panel de Control</h1>
           {pagination && (
             <p className="text-sm text-muted-foreground mt-1">
-              Mostrando {(pagination.page - 1) * pagination.limit + 1} -{" "}
-              {Math.min(pagination.page * pagination.limit, pagination.totalCount)} de{" "}
-              {pagination.totalCount} viajes
+              Mostrando {(pagination.page - 1) * pagination.limit + 1}–
+              {Math.min(
+                pagination.page * pagination.limit,
+                pagination.totalCount,
+              )}{" "}
+              de {pagination.totalCount} viajes
             </p>
           )}
         </div>
-        <Button
-          onClick={() => exportExcel.mutate()}
-          disabled={exportExcel.isPending}
-          size="lg"
-          className="gap-2"
-        >
-          {exportExcel.isPending ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-              Exportando...
-            </>
-          ) : (
-            <>
-              <FileSpreadsheet className="w-4 h-4" />
-              Exportar Excel
-            </>
-          )}
-        </Button>
+
+        <div className="flex gap-3">
+          {/* Ir a gestión de cards */}
+          <Button variant="outline" asChild>
+            <Link href="/admin/alltrips">
+              <Plus className="w-4 h-4 mr-2" />
+              Gestionar Viajes
+            </Link>
+          </Button>
+
+          {/* Exportar Excel */}
+          <Button
+            onClick={() => exportExcel.mutate()}
+            disabled={exportExcel.isPending}
+          >
+            {exportExcel.isPending ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                Exportando...
+              </>
+            ) : (
+              <>
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                Exportar Excel
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* ✅ Filtros */}
+      <div className="flex gap-4 items-end bg-muted/50 p-4 rounded-lg border">
+        <div className="flex-1">
+          <label className="text-sm font-medium mb-2 block">
+            Filtrar por usuario
+          </label>
+          <Select
+            value={filterUserId || "all"}
+            onValueChange={(val) => setFilterUserId(val === "all" ? "" : val)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Todos los usuarios" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los usuarios</SelectItem>
+              {availableUsers.map((u) => (
+                <SelectItem key={u.id} value={u.id}>
+                  {u.name} ({u.email})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex-1">
+          <label className="text-sm font-medium mb-2 block">
+            Filtrar por estado
+          </label>
+          <Select
+            value={filterStatus || "all"}
+            onValueChange={(val) =>
+              setFilterStatus(val === "all" ? "" : (val as TripStatus))
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Todos los estados" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los estados</SelectItem>
+              {STATUS_OPTIONS.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Botón limpiar filtros */}
+        {(filterUserId || filterStatus) && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setFilterUserId("");
+              setFilterStatus("");
+            }}
+            className="gap-2"
+          >
+            <X className="w-4 h-4" />
+            Limpiar filtros
+          </Button>
+        )}
       </div>
 
       {trips.length > 0 ? (
@@ -113,20 +218,28 @@ export default function AdminPage() {
                   <TableRow key={trip.id}>
                     <TableCell className="font-medium">{trip.city}</TableCell>
                     <TableCell>
-                      <div>
-                        <div className="font-medium">{trip.user?.name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {trip.user?.email}
+                      {trip.assignedUsers && trip.assignedUsers.length > 0 ? (
+                        <div>
+                          {trip.assignedUsers.map((a) => (
+                            <div key={a.userId}>
+                              <div className="font-medium">{a.user?.name}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {a.user?.email}
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      </div>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">
+                          Sin asignar
+                        </span>
+                      )}
                     </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
-                      </div>
+                    <TableCell className="text-sm">
+                      {formatDate(trip.startDate)} — {formatDate(trip.endDate)}
                     </TableCell>
                     <TableCell className="text-right">
-                      {trip.expenses?.length || 0}
+                      {trip.expenses?.length ?? 0}
                     </TableCell>
                     <TableCell className="text-right font-semibold">
                       {formatCurrency(trip.totalAmount)}
@@ -172,12 +285,12 @@ export default function AdminPage() {
             </Table>
           </div>
 
-          {/* ✅ PAGINACIÓN */}
+          {/* Paginación */}
           {pagination && pagination.totalPages > 1 && (
             <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Página {pagination.page} de {pagination.totalPages}
-              </div>
+              </p>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -202,8 +315,23 @@ export default function AdminPage() {
           )}
         </>
       ) : (
-        <div className="text-center py-12 text-muted-foreground border rounded-lg">
-          No hay viajes registrados
+        <div className="text-center py-16 border rounded-lg text-muted-foreground">
+          <p className="mb-4">
+            {filterUserId || filterStatus
+              ? "No hay viajes que coincidan con los filtros seleccionados"
+              : "No hay viajes registrados"}
+          </p>
+          {(filterUserId || filterStatus) && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFilterUserId("");
+                setFilterStatus("");
+              }}
+            >
+              Limpiar filtros
+            </Button>
+          )}
         </div>
       )}
     </div>

@@ -7,6 +7,8 @@ export const createTripSchema = z.object({
   endDate: z.string().datetime().or(z.date()),
   project: z.string().optional(),
   notes: z.string().optional(),
+  assignedUserIds: z.array(z.string()).min(1, "Debes asignar al menos un usuario"), // ✅ NUEVO
+
 });
 
 export const updateTripSchema = z.object({
@@ -17,6 +19,7 @@ export const updateTripSchema = z.object({
   notes: z.string().optional(),
   status: z.enum(["PENDIENTE", "APROBADO", "RECHAZADO"]).optional(), // ✅ Corregido
   totalAmount: z.number().optional(),
+  assignedUserIds: z.array(z.string()).optional(), 
 });
 
 // Schema específico para actualizar status

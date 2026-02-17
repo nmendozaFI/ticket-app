@@ -10,6 +10,35 @@ type Params = {
   params: Promise<{ tripId: string; expenseId: string }>;
 };
 
+// ✅ Helper: verifica que el usuario tiene acceso al expense
+// Comprueba que el expense pertenece al trip Y que el user tiene acceso al trip
+async function verifyExpenseAccess(
+  expenseId: string,
+  tripId: string,
+  userId: string,
+  isAdmin: boolean
+) {
+  if (isAdmin) {
+    // Admin puede acceder a cualquier expense
+    return prisma.expense.findFirst({
+      where: { id: expenseId, tripId },
+    });
+  }
+
+  // User solo puede acceder a expenses de trips asignados a él
+  return prisma.expense.findFirst({
+    where: {
+      id: expenseId,
+      tripId,
+      trip: {
+        assignedUsers: {
+          some: { userId },
+        },
+      },
+    },
+  });
+}
+
 export async function PUT(request: Request, { params }: Params) {
   try {
     const { tripId, expenseId } = await params;
@@ -21,22 +50,18 @@ export async function PUT(request: Request, { params }: Params) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verificar que el expense existe y pertenece a un trip del usuario
-    const existingExpense = await prisma.expense.findFirst({
-      where: {
-        id: expenseId,
-        tripId,
-        trip: {
-          userId: session.user.id,
-        },
-      },
-    });
+    const isAdmin = session.user.role === "ADMIN";
+
+    // ✅ Verificar acceso al expense
+    const existingExpense = await verifyExpenseAccess(
+      expenseId,
+      tripId,
+      session.user.id,
+      isAdmin
+    );
 
     if (!existingExpense) {
-      return NextResponse.json(
-        { error: "Expense not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Expense not found" }, { status: 404 });
     }
 
     const body = await request.json();
@@ -63,8 +88,14 @@ export async function PUT(request: Request, { params }: Params) {
     if (validatedData.receiptUrl !== undefined) {
       updateData.receiptUrl = validatedData.receiptUrl;
     }
+    if (validatedData.invoiceNumber !== undefined) {
+      updateData.invoiceNumber = validatedData.invoiceNumber;
+    }
+    if (validatedData.paymentMethod !== undefined) {
+      updateData.paymentMethod = validatedData.paymentMethod;
+    }
 
-    // Si cambia el amount, actualizar el total del trip
+    // ✅ Si cambia el amount, actualizar el total del trip en transacción
     let expense;
     if (validatedData.amount !== undefined) {
       const amountDifference =
@@ -119,25 +150,21 @@ export async function DELETE(_: Request, { params }: Params) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verificar que el expense existe y pertenece a un trip del usuario
-    const existingExpense = await prisma.expense.findFirst({
-      where: {
-        id: expenseId,
-        tripId,
-        trip: {
-          userId: session.user.id,
-        },
-      },
-    });
+    const isAdmin = session.user.role === "ADMIN";
+
+    // ✅ Verificar acceso al expense
+    const existingExpense = await verifyExpenseAccess(
+      expenseId,
+      tripId,
+      session.user.id,
+      isAdmin
+    );
 
     if (!existingExpense) {
-      return NextResponse.json(
-        { error: "Expense not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Expense not found" }, { status: 404 });
     }
 
-    // Eliminar expense y actualizar total en transacción
+    // ✅ Eliminar expense y actualizar total en transacción
     await prisma.$transaction([
       prisma.expense.delete({
         where: { id: expenseId },

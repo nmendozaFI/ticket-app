@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
-import { updateStatusSchema } from "@/lib/validations"; 
+import { updateStatusSchema } from "@/lib/validations";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
@@ -9,29 +9,36 @@ type Params = {
   params: Promise<{ tripId: string }>;
 };
 
+// ✅ Include reutilizable
+const tripInclude = {
+  assignedUsers: {
+    include: {
+      user: {
+        select: { id: true, name: true, email: true },
+      },
+    },
+  },
+  expenses: {
+    orderBy: { date: "desc" as const },
+  },
+} as const;
+
 export async function PUT(request: Request, { params }: Params) {
   try {
     const { tripId } = await params;
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await auth.api.getSession({ headers: await headers() });
 
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
-    const { status } = updateStatusSchema.parse(body); // ✅ Usar schema correcto
+    const { status } = updateStatusSchema.parse(body);
 
     const trip = await prisma.trip.update({
       where: { id: tripId },
       data: { status },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true },
-        },
-        expenses: true,
-      },
+      include: tripInclude,
     });
 
     return NextResponse.json(trip);

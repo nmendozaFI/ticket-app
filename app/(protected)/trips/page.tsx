@@ -1,20 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { useTrips, useCreateTrip, useUpdateTrip } from "@/hooks/useTrips";
-import type { Trip, CreateTripDto } from "@/types";
+import { useTrips, useExportUserExcel } from "@/hooks/useTrips";
+import type { Trip } from "@/types";
 import TripCard from "@/components/trips/TripCard";
-import TripForm from "@/components/forms/TripForm";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2 } from "lucide-react";
+import { Loader2, Luggage, FileSpreadsheet } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function TripsPage() {
   const {
@@ -25,32 +16,20 @@ export default function TripsPage() {
     isFetchingNextPage,
   } = useTrips();
   
-  const createTrip = useCreateTrip();
-  const updateTrip = useUpdateTrip();
+  const exportExcel = useExportUserExcel();
 
-  const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleSubmit = (formData: CreateTripDto) => {
-    if (editingTrip) {
-      updateTrip.mutate({ tripId: editingTrip.id, data: formData });
-    } else {
-      createTrip.mutate(formData);
-    }
-    setIsOpen(false);
-    setEditingTrip(null);
-  };
-
-  // ✅ Flatten todas las páginas en un solo array
-  const allTrips = data?.pages.flatMap((page) => page.trips) || [];
+  const allTrips = data?.pages.flatMap((page) => page.trips) ?? [];
 
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto p-8">
-        <Skeleton className="h-10 w-56 mb-8" />
+        <div className="mb-8">
+          <Skeleton className="h-10 w-64 mb-2" />
+          <Skeleton className="h-5 w-48" />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(9)].map((_, i) => (
-            <Skeleton key={i} className="h-80 w-full" />
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="h-80 w-full rounded-xl" />
           ))}
         </div>
       </div>
@@ -59,30 +38,37 @@ export default function TripsPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-900">Mis Viajes</h1>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-              + Nuevo Viaje
+      <div className="mb-8">
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900">Mis Viajes</h1>
+            <p className="text-muted-foreground mt-1">
+              Viajes asignados a ti por el administrador
+            </p>
+          </div>
+
+          {/* ✅ Botón exportar Excel — solo visible si hay trips */}
+          {allTrips.length > 0 && (
+            <Button
+              onClick={() => exportExcel.mutate()}
+              disabled={exportExcel.isPending}
+              variant="outline"
+              className="gap-2"
+            >
+              {exportExcel.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Exportando...
+                </>
+              ) : (
+                <>
+                  <FileSpreadsheet className="w-4 h-4" />
+                  Exportar mis gastos
+                </>
+              )}
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {editingTrip ? "Editar Viaje" : "Nuevo Viaje"}
-              </DialogTitle>
-            </DialogHeader>
-            <TripForm
-              initialData={editingTrip}
-              onSubmit={handleSubmit}
-              onCancel={() => {
-                setIsOpen(false);
-                setEditingTrip(null);
-              }}
-            />
-          </DialogContent>
-        </Dialog>
+          )}
+        </div>
       </div>
 
       {allTrips.length > 0 ? (
@@ -92,17 +78,13 @@ export default function TripsPage() {
               <TripCard
                 key={trip.id}
                 tripId={trip.id}
-                onEdit={(trip) => {
-                  setEditingTrip(trip);
-                  setIsOpen(true);
-                }}
+                readOnly
               />
             ))}
           </div>
 
-          {/* ✅ BOTÓN CARGAR MÁS */}
           {hasNextPage && (
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-10">
               <Button
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
@@ -122,8 +104,13 @@ export default function TripsPage() {
           )}
         </>
       ) : (
-        <div className="text-center py-12 text-muted-foreground">
-          No tienes viajes registrados. ¡Crea tu primer viaje!
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <Luggage className="w-16 h-16 text-muted-foreground mb-4" />
+          <h2 className="text-xl font-semibold mb-2">No tienes viajes asignados</h2>
+          <p className="text-muted-foreground max-w-sm">
+            El administrador todavía no te ha asignado ningún viaje.
+            Cuando lo haga, aparecerá aquí.
+          </p>
         </div>
       )}
     </div>

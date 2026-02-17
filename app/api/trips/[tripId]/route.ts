@@ -24,7 +24,7 @@ export async function GET(_: Request, { params }: Params) {
     const trip = await prisma.trip.findFirst({
       where: {
         id: tripId,
-        userId: session.user.id,
+        assignedUsers: { some: { userId: session.user.id } }
       },
       include: {
         expenses: {
@@ -42,10 +42,7 @@ export async function GET(_: Request, { params }: Params) {
     return NextResponse.json(trip);
   } catch (error) {
     console.error("Error fetching trip:", error);
-    return NextResponse.json(
-      { error: "Error fetching trip" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error fetching trip" }, { status: 500 });
   }
 }
 
@@ -64,7 +61,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const existingTrip = await prisma.trip.findFirst({
       where: {
         id: tripId,
-        userId: session.user.id,
+        assignedUsers: { some: { userId: session.user.id } }
       },
     });
 
@@ -81,7 +78,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
     if (validatedData.city !== undefined) updateData.city = validatedData.city;
     if (validatedData.project !== undefined)
       updateData.project = validatedData.project;
-    if (validatedData.notes !== undefined) updateData.notes = validatedData.notes;
+    if (validatedData.notes !== undefined)
+      updateData.notes = validatedData.notes;
     if (validatedData.status !== undefined)
       updateData.status = validatedData.status;
 
@@ -93,6 +91,16 @@ export async function PUT(request: NextRequest, { params }: Params) {
     }
     if (validatedData.totalAmount !== undefined) {
       updateData.totalAmount = new Prisma.Decimal(validatedData.totalAmount);
+    }
+    // En el PUT, añadir manejo de assignedUserIds:
+    if (validatedData.assignedUserIds !== undefined) {
+      // ✅ Reemplazar asignaciones en transacción
+      await prisma.$transaction([
+        prisma.tripAssignment.deleteMany({ where: { tripId } }),
+        ...validatedData.assignedUserIds.map((userId) =>
+          prisma.tripAssignment.create({ data: { tripId, userId } }),
+        ),
+      ]);
     }
 
     const trip = await prisma.trip.update({
@@ -112,14 +120,11 @@ export async function PUT(request: NextRequest, { params }: Params) {
     if (error instanceof ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error updating trip:", error);
-    return NextResponse.json(
-      { error: "Error updating trip" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error updating trip" }, { status: 500 });
   }
 }
 
@@ -138,7 +143,7 @@ export async function DELETE(_: Request, { params }: Params) {
     const existingTrip = await prisma.trip.findFirst({
       where: {
         id: tripId,
-        userId: session.user.id,
+        assignedUsers: { some: { userId: session.user.id } }
       },
     });
 
@@ -150,12 +155,12 @@ export async function DELETE(_: Request, { params }: Params) {
       where: { id: tripId },
     });
 
-    return NextResponse.json({ ok: true, message: "Trip deleted successfully" });
+    return NextResponse.json({
+      ok: true,
+      message: "Trip deleted successfully",
+    });
   } catch (error) {
     console.error("Error deleting trip:", error);
-    return NextResponse.json(
-      { error: "Error deleting trip" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error deleting trip" }, { status: 500 });
   }
 }

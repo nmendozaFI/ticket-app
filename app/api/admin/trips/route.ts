@@ -21,8 +21,12 @@ export async function GET(request: NextRequest) {
     const [trips, totalCount] = await Promise.all([
       prisma.trip.findMany({
         include: {
-          user: {
-            select: { id: true, name: true, email: true },
+          assignedUsers: {
+            include: {
+              user: {
+                select: { id: true, name: true, email: true },
+              },
+            },
           },
           expenses: true,
         },
@@ -47,7 +51,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching admin trips:", error);
     return NextResponse.json(
       { error: "Error fetching trips" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

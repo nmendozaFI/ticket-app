@@ -45,6 +45,7 @@ export type ExpenseMinAggregateOutputType = {
   receiptUrl: string | null
   invoiceNumber: string | null
   paymentMethod: string | null
+  createdByAdminId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -60,6 +61,7 @@ export type ExpenseMaxAggregateOutputType = {
   receiptUrl: string | null
   invoiceNumber: string | null
   paymentMethod: string | null
+  createdByAdminId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -75,6 +77,7 @@ export type ExpenseCountAggregateOutputType = {
   receiptUrl: number
   invoiceNumber: number
   paymentMethod: number
+  createdByAdminId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -100,6 +103,7 @@ export type ExpenseMinAggregateInputType = {
   receiptUrl?: true
   invoiceNumber?: true
   paymentMethod?: true
+  createdByAdminId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -115,6 +119,7 @@ export type ExpenseMaxAggregateInputType = {
   receiptUrl?: true
   invoiceNumber?: true
   paymentMethod?: true
+  createdByAdminId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -130,6 +135,7 @@ export type ExpenseCountAggregateInputType = {
   receiptUrl?: true
   invoiceNumber?: true
   paymentMethod?: true
+  createdByAdminId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -232,6 +238,7 @@ export type ExpenseGroupByOutputType = {
   receiptUrl: string | null
   invoiceNumber: string | null
   paymentMethod: string | null
+  createdByAdminId: string | null
   createdAt: Date
   updatedAt: Date
   _count: ExpenseCountAggregateOutputType | null
@@ -270,6 +277,7 @@ export type ExpenseWhereInput = {
   receiptUrl?: Prisma.StringNullableFilter<"Expense"> | string | null
   invoiceNumber?: Prisma.StringNullableFilter<"Expense"> | string | null
   paymentMethod?: Prisma.StringNullableFilter<"Expense"> | string | null
+  createdByAdminId?: Prisma.StringNullableFilter<"Expense"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
   trip?: Prisma.XOR<Prisma.TripScalarRelationFilter, Prisma.TripWhereInput>
@@ -286,6 +294,7 @@ export type ExpenseOrderByWithRelationInput = {
   receiptUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   invoiceNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdByAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   trip?: Prisma.TripOrderByWithRelationInput
@@ -305,6 +314,7 @@ export type ExpenseWhereUniqueInput = Prisma.AtLeast<{
   receiptUrl?: Prisma.StringNullableFilter<"Expense"> | string | null
   invoiceNumber?: Prisma.StringNullableFilter<"Expense"> | string | null
   paymentMethod?: Prisma.StringNullableFilter<"Expense"> | string | null
+  createdByAdminId?: Prisma.StringNullableFilter<"Expense"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
   trip?: Prisma.XOR<Prisma.TripScalarRelationFilter, Prisma.TripWhereInput>
@@ -321,6 +331,7 @@ export type ExpenseOrderByWithAggregationInput = {
   receiptUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   invoiceNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentMethod?: Prisma.SortOrderInput | Prisma.SortOrder
+  createdByAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ExpenseCountOrderByAggregateInput
@@ -344,6 +355,7 @@ export type ExpenseScalarWhereWithAggregatesInput = {
   receiptUrl?: Prisma.StringNullableWithAggregatesFilter<"Expense"> | string | null
   invoiceNumber?: Prisma.StringNullableWithAggregatesFilter<"Expense"> | string | null
   paymentMethod?: Prisma.StringNullableWithAggregatesFilter<"Expense"> | string | null
+  createdByAdminId?: Prisma.StringNullableWithAggregatesFilter<"Expense"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Expense"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Expense"> | Date | string
 }
@@ -358,6 +370,7 @@ export type ExpenseCreateInput = {
   receiptUrl?: string | null
   invoiceNumber?: string | null
   paymentMethod?: string | null
+  createdByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   trip: Prisma.TripCreateNestedOneWithoutExpensesInput
@@ -374,6 +387,7 @@ export type ExpenseUncheckedCreateInput = {
   receiptUrl?: string | null
   invoiceNumber?: string | null
   paymentMethod?: string | null
+  createdByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -388,6 +402,7 @@ export type ExpenseUpdateInput = {
   receiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   trip?: Prisma.TripUpdateOneRequiredWithoutExpensesNestedInput
@@ -404,6 +419,7 @@ export type ExpenseUncheckedUpdateInput = {
   receiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -419,6 +435,7 @@ export type ExpenseCreateManyInput = {
   receiptUrl?: string | null
   invoiceNumber?: string | null
   paymentMethod?: string | null
+  createdByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -433,6 +450,7 @@ export type ExpenseUpdateManyMutationInput = {
   receiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -448,6 +466,7 @@ export type ExpenseUncheckedUpdateManyInput = {
   receiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -473,6 +492,7 @@ export type ExpenseCountOrderByAggregateInput = {
   receiptUrl?: Prisma.SortOrder
   invoiceNumber?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
+  createdByAdminId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -492,6 +512,7 @@ export type ExpenseMaxOrderByAggregateInput = {
   receiptUrl?: Prisma.SortOrder
   invoiceNumber?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
+  createdByAdminId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -507,6 +528,7 @@ export type ExpenseMinOrderByAggregateInput = {
   receiptUrl?: Prisma.SortOrder
   invoiceNumber?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
+  createdByAdminId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -567,6 +589,7 @@ export type ExpenseCreateWithoutTripInput = {
   receiptUrl?: string | null
   invoiceNumber?: string | null
   paymentMethod?: string | null
+  createdByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -581,6 +604,7 @@ export type ExpenseUncheckedCreateWithoutTripInput = {
   receiptUrl?: string | null
   invoiceNumber?: string | null
   paymentMethod?: string | null
+  createdByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -625,6 +649,7 @@ export type ExpenseScalarWhereInput = {
   receiptUrl?: Prisma.StringNullableFilter<"Expense"> | string | null
   invoiceNumber?: Prisma.StringNullableFilter<"Expense"> | string | null
   paymentMethod?: Prisma.StringNullableFilter<"Expense"> | string | null
+  createdByAdminId?: Prisma.StringNullableFilter<"Expense"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Expense"> | Date | string
 }
@@ -639,6 +664,7 @@ export type ExpenseCreateManyTripInput = {
   receiptUrl?: string | null
   invoiceNumber?: string | null
   paymentMethod?: string | null
+  createdByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -653,6 +679,7 @@ export type ExpenseUpdateWithoutTripInput = {
   receiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -667,6 +694,7 @@ export type ExpenseUncheckedUpdateWithoutTripInput = {
   receiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -681,6 +709,7 @@ export type ExpenseUncheckedUpdateManyWithoutTripInput = {
   receiptUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invoiceNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -698,6 +727,7 @@ export type ExpenseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   receiptUrl?: boolean
   invoiceNumber?: boolean
   paymentMethod?: boolean
+  createdByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   trip?: boolean | Prisma.TripDefaultArgs<ExtArgs>
@@ -714,6 +744,7 @@ export type ExpenseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   receiptUrl?: boolean
   invoiceNumber?: boolean
   paymentMethod?: boolean
+  createdByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   trip?: boolean | Prisma.TripDefaultArgs<ExtArgs>
@@ -730,6 +761,7 @@ export type ExpenseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   receiptUrl?: boolean
   invoiceNumber?: boolean
   paymentMethod?: boolean
+  createdByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   trip?: boolean | Prisma.TripDefaultArgs<ExtArgs>
@@ -746,11 +778,12 @@ export type ExpenseSelectScalar = {
   receiptUrl?: boolean
   invoiceNumber?: boolean
   paymentMethod?: boolean
+  createdByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ExpenseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tripId" | "date" | "amount" | "category" | "vendor" | "description" | "receiptUrl" | "invoiceNumber" | "paymentMethod" | "createdAt" | "updatedAt", ExtArgs["result"]["expense"]>
+export type ExpenseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tripId" | "date" | "amount" | "category" | "vendor" | "description" | "receiptUrl" | "invoiceNumber" | "paymentMethod" | "createdByAdminId" | "createdAt" | "updatedAt", ExtArgs["result"]["expense"]>
 export type ExpenseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   trip?: boolean | Prisma.TripDefaultArgs<ExtArgs>
 }
@@ -777,6 +810,7 @@ export type $ExpensePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     receiptUrl: string | null
     invoiceNumber: string | null
     paymentMethod: string | null
+    createdByAdminId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["expense"]>
@@ -1213,6 +1247,7 @@ export interface ExpenseFieldRefs {
   readonly receiptUrl: Prisma.FieldRef<"Expense", 'String'>
   readonly invoiceNumber: Prisma.FieldRef<"Expense", 'String'>
   readonly paymentMethod: Prisma.FieldRef<"Expense", 'String'>
+  readonly createdByAdminId: Prisma.FieldRef<"Expense", 'String'>
   readonly createdAt: Prisma.FieldRef<"Expense", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Expense", 'DateTime'>
 }

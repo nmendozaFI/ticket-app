@@ -52,11 +52,12 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  Trip: 'Trip',
+  TripAssignment: 'TripAssignment',
+  Expense: 'Expense',
   Session: 'Session',
   Account: 'Account',
-  Verification: 'Verification',
-  Trip: 'Trip',
-  Expense: 'Expense'
+  Verification: 'Verification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -87,6 +88,52 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const TripScalarFieldEnum = {
+  id: 'id',
+  createdByAdminId: 'createdByAdminId',
+  city: 'city',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  project: 'project',
+  notes: 'notes',
+  status: 'status',
+  totalAmount: 'totalAmount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TripScalarFieldEnum = (typeof TripScalarFieldEnum)[keyof typeof TripScalarFieldEnum]
+
+
+export const TripAssignmentScalarFieldEnum = {
+  id: 'id',
+  tripId: 'tripId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type TripAssignmentScalarFieldEnum = (typeof TripAssignmentScalarFieldEnum)[keyof typeof TripAssignmentScalarFieldEnum]
+
+
+export const ExpenseScalarFieldEnum = {
+  id: 'id',
+  tripId: 'tripId',
+  date: 'date',
+  amount: 'amount',
+  category: 'category',
+  vendor: 'vendor',
+  description: 'description',
+  receiptUrl: 'receiptUrl',
+  invoiceNumber: 'invoiceNumber',
+  paymentMethod: 'paymentMethod',
+  createdByAdminId: 'createdByAdminId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
 
 
 export const SessionScalarFieldEnum = {
@@ -132,41 +179,6 @@ export const VerificationScalarFieldEnum = {
 } as const
 
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
-
-
-export const TripScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  city: 'city',
-  startDate: 'startDate',
-  endDate: 'endDate',
-  project: 'project',
-  notes: 'notes',
-  status: 'status',
-  totalAmount: 'totalAmount',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type TripScalarFieldEnum = (typeof TripScalarFieldEnum)[keyof typeof TripScalarFieldEnum]
-
-
-export const ExpenseScalarFieldEnum = {
-  id: 'id',
-  tripId: 'tripId',
-  date: 'date',
-  amount: 'amount',
-  category: 'category',
-  vendor: 'vendor',
-  description: 'description',
-  receiptUrl: 'receiptUrl',
-  invoiceNumber: 'invoiceNumber',
-  paymentMethod: 'paymentMethod',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
 
 
 export const SortOrder = {

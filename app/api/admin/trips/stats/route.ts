@@ -1,7 +1,19 @@
-import prisma from "@/lib/db";
 import { auth } from "@/lib/auth";
+import prisma from "@/lib/db";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+
+// ✅ Include reutilizable
+const tripInclude = {
+  assignedUsers: {
+    include: {
+      user: {
+        select: { id: true, name: true, email: true },
+      },
+    },
+  },
+  expenses: true,
+} as const;
 
 export async function GET() {
   try {
@@ -11,14 +23,8 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ✅ Obtener TODOS los trips para stats
     const trips = await prisma.trip.findMany({
-      include: {
-        user: {
-          select: { id: true, name: true, email: true },
-        },
-        expenses: true,
-      },
+      include: tripInclude,
       orderBy: { createdAt: "desc" },
     });
 
