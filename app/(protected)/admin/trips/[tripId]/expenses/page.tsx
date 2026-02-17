@@ -49,10 +49,14 @@ export default function AdminTripExpenses({
 
   const getStatusVariant = (status: TripStatus) => {
     switch (status) {
-      case "PENDIENTE": return "outline";
-      case "APROBADO":  return "default";
-      case "RECHAZADO": return "destructive";
-      default:          return "outline";
+      case "PENDIENTE":
+        return "outline";
+      case "APROBADO":
+        return "default";
+      case "RECHAZADO":
+        return "destructive";
+      default:
+        return "outline";
     }
   };
 
@@ -82,7 +86,6 @@ export default function AdminTripExpenses({
 
   return (
     <div className="max-w-6xl mx-auto p-8">
-
       {/* Volver */}
       <Button variant="outline" asChild className="mb-6">
         <Link href="/admin">
@@ -93,7 +96,7 @@ export default function AdminTripExpenses({
 
       {/* Header del viaje */}
       <div className="bg-card border rounded-lg p-6 space-y-4 mb-8">
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold">{trip.city}</h1>
             {trip.project && (
@@ -109,7 +112,10 @@ export default function AdminTripExpenses({
             <Select
               value={trip.status}
               onValueChange={(status) =>
-                updateStatus.mutate({ tripId: trip.id, status: status as TripStatus })
+                updateStatus.mutate({
+                  tripId: trip.id,
+                  status: status as TripStatus,
+                })
               }
               disabled={updateStatus.isPending}
             >
@@ -118,7 +124,9 @@ export default function AdminTripExpenses({
               </SelectTrigger>
               <SelectContent>
                 {STATUS_OPTIONS.map((s) => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -127,18 +135,23 @@ export default function AdminTripExpenses({
 
         {/* Info del viaje */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
-
-          {/* ✅ Usuarios asignados — ya no trip.user sino assignedUsers */}
+          {/* ✅ Usuarios asignados */}
           <div>
             <p className="text-sm text-muted-foreground mb-1">
-              {assignedUsers.length === 1 ? "Usuario asignado" : "Usuarios asignados"}
+              {assignedUsers.length === 1
+                ? "Usuario asignado"
+                : "Usuarios asignados"}
             </p>
             {assignedUsers.length > 0 ? (
               <div className="space-y-1">
                 {assignedUsers.map((a) => (
                   <div key={a.userId}>
-                    <p className="font-medium">{a.user?.name ?? "Sin nombre"}</p>
-                    <p className="text-xs text-muted-foreground">{a.user?.email}</p>
+                    <p className="font-medium">
+                      {a.user?.name ?? "Sin nombre"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {a.user?.email}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -208,7 +221,9 @@ export default function AdminTripExpenses({
                     <TableCell>
                       {/* ✅ Billete creado por admin se marca visualmente */}
                       <Badge
-                        variant={expense.createdByAdminId ? "default" : "secondary"}
+                        variant={
+                          expense.createdByAdminId ? "default" : "secondary"
+                        }
                       >
                         {expense.category ?? "-"}
                       </Badge>

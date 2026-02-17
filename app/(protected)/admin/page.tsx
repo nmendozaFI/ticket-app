@@ -89,8 +89,8 @@ export default function AdminPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-8 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
+      <div className="flex flex-col items-center gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="text-center md:text-left">
           <h1 className="text-4xl font-bold">Panel de Control</h1>
           {pagination && (
             <p className="text-sm text-muted-foreground mt-1">
@@ -104,7 +104,7 @@ export default function AdminPage() {
           )}
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto mb-3">
           {/* Ir a gestión de cards */}
           <Button variant="outline" asChild>
             <Link href="/admin/alltrips">
@@ -132,9 +132,8 @@ export default function AdminPage() {
           </Button>
         </div>
       </div>
-
       {/* ✅ Filtros */}
-      <div className="flex gap-4 items-end bg-muted/50 p-4 rounded-lg border">
+      <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end bg-muted/50 p-4 rounded-lg border">
         <div className="flex-1">
           <label className="text-sm font-medium mb-2 block">
             Filtrar por usuario
@@ -190,14 +189,13 @@ export default function AdminPage() {
               setFilterUserId("");
               setFilterStatus("");
             }}
-            className="gap-2"
+            className="gap-2 sm:self-end"
           >
             <X className="w-4 h-4" />
             Limpiar filtros
           </Button>
         )}
       </div>
-
       {trips.length > 0 ? (
         <>
           <div className="border rounded-lg">

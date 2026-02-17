@@ -9,21 +9,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useAdminTrips, useCreateTrip, useUpdateTrip, useDeleteTrip } from "@/hooks/useAdminTrips";
-import type { CreateTripDto, Trip, } from "@/types";
+import {
+  useAdminTrips,
+  useCreateTrip,
+  useUpdateTrip,
+  useDeleteTrip,
+} from "@/hooks/useAdminTrips";
+import type { CreateTripDto, Trip } from "@/types";
 import TripCard from "@/components/trips/TripCard";
 import TripForm from "@/components/forms/TripForm";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2, Plus, Map } from "lucide-react";
 
 export default function AdminAllTripsPage() {
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useAdminTrips();
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useAdminTrips();
 
   const createTrip = useCreateTrip();
   const updateTrip = useUpdateTrip();
@@ -83,8 +83,8 @@ export default function AdminAllTripsPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-8">
-      <div className="flex justify-between items-center mb-8">
-        <div>
+      <div className="flex flex-col items-center gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="text-center md:text-left">
           <h1 className="text-4xl font-bold text-gray-900">Todos los Viajes</h1>
           <p className="text-muted-foreground mt-1">
             Crea, edita y gestiona los viajes de todos los usuarios
@@ -92,35 +92,37 @@ export default function AdminAllTripsPage() {
         </div>
 
         {/* ✅ Dialog para crear/editar viaje — solo visible para ADMIN */}
-        <Dialog
-          open={isOpen}
-          onOpenChange={(open) => {
-            setIsOpen(open);
-            if (!open) setEditingTrip(null);
-          }}
-        >
-          <DialogTrigger asChild>
-            <Button size="lg" className="gap-2">
-              <Plus className="w-4 h-4" />
-              Nuevo Viaje
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {editingTrip ? "Editar Viaje" : "Nuevo Viaje"}
-              </DialogTitle>
-            </DialogHeader>
-            <TripForm
-              initialData={editingTrip}
-              onSubmit={handleSubmit}
-              onCancel={() => {
-                setIsOpen(false);
-                setEditingTrip(null);
-              }}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto mb-4">
+          <Dialog
+            open={isOpen}
+            onOpenChange={(open) => {
+              setIsOpen(open);
+              if (!open) setEditingTrip(null);
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button size="lg" className="gap-2">
+                <Plus className="w-4 h-4" />
+                Nuevo Viaje
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingTrip ? "Editar Viaje" : "Nuevo Viaje"}
+                </DialogTitle>
+              </DialogHeader>
+              <TripForm
+                initialData={editingTrip}
+                onSubmit={handleSubmit}
+                onCancel={() => {
+                  setIsOpen(false);
+                  setEditingTrip(null);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {allTrips.length > 0 ? (
@@ -166,10 +168,7 @@ export default function AdminAllTripsPage() {
           <p className="text-muted-foreground max-w-sm mb-6">
             Crea el primer viaje y asígnalo a un usuario.
           </p>
-          <Button
-            onClick={() => setIsOpen(true)}
-            className="gap-2"
-          >
+          <Button onClick={() => setIsOpen(true)} className="gap-2">
             <Plus className="w-4 h-4" />
             Crear primer viaje
           </Button>

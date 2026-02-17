@@ -43,22 +43,24 @@ export default function TripExpensesPage() {
       >
         ← Volver
       </Button>
-      <div className="flex justify-between items-center">
-        <div>
+      <div className="flex flex-col items-center gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="text-center md:text-left">
           <h1 className="text-2xl font-bold">Gastos de {trip?.city}</h1>
           <p className="text-sm text-muted-foreground">
             Del {trip && formatDate(trip.startDate)} al{" "}
             {trip && formatDate(trip.endDate)}
           </p>
         </div>
-        <Button
-          onClick={() => {
-            setEditing(null);
-            setShowForm(true);
-          }}
-        >
-          Nuevo gasto
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto mb-2">
+          <Button
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+          >
+            Nuevo gasto
+          </Button>
+        </div>
       </div>
 
       {showForm && (
@@ -107,9 +109,9 @@ export default function TripExpensesPage() {
             expenses.map((exp: Expense) => (
               <div
                 key={exp.id}
-                className="flex justify-between items-center border rounded p-2"
+                className="flex flex-col sm:flex-row sm:justify-between sm:items-center border rounded p-2 gap-3"
               >
-                <div>
+                <div className="flex-1">
                   <p className="font-medium">
                     {exp.vendor || exp.category || "Sin categoría"}
                   </p>
@@ -117,8 +119,8 @@ export default function TripExpensesPage() {
                     {formatDate(exp.date)} • {exp.description}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <span className="font-semibold text-center sm:text-right">
                     {formatCurrency(exp.amount)}
                   </span>
                   <Button
@@ -128,6 +130,7 @@ export default function TripExpensesPage() {
                       setEditing(exp);
                       setShowForm(true);
                     }}
+                    className="w-full sm:w-auto"
                   >
                     Editar
                   </Button>
@@ -135,6 +138,7 @@ export default function TripExpensesPage() {
                     variant="destructive"
                     size="sm"
                     onClick={() => deleteExpense.mutate(exp.id)}
+                    className="w-full sm:w-auto"
                   >
                     Borrar
                   </Button>

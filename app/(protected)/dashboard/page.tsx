@@ -32,19 +32,21 @@ export default function UserDashboard() {
 
   return (
     <main className="flex flex-col gap-6 p-6">
-      <section className="flex items-center justify-between">
-        <div>
+      <section className="flex flex-col items-center gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="text-center md:text-left">
           <h1 className="text-2xl font-bold">Mis viajes</h1>
           <p className="text-muted-foreground text-sm">
             Resumen de tus viajes y gastos.
           </p>
         </div>
-        <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-          onClick={() => router.push("/trips")}
-        >
-          Ver todos mis viajes
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button
+            className="bg-red-600 hover:bg-red-700 text-white"
+            onClick={() => router.push("/trips")}
+          >
+            Ver todos mis viajes
+          </Button>
+        </div>
       </section>
 
       {/* KPIs */}
@@ -140,8 +142,8 @@ export default function UserDashboard() {
                           trip.status === "APROBADO"
                             ? "default"
                             : trip.status === "PENDIENTE"
-                            ? "outline"
-                            : "destructive"
+                              ? "outline"
+                              : "destructive"
                         }
                       >
                         {trip.status}

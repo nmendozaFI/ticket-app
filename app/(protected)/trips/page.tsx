@@ -8,14 +8,9 @@ import { Loader2, Luggage, FileSpreadsheet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function TripsPage() {
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useTrips();
-  
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useTrips();
+
   const exportExcel = useExportUserExcel();
 
   const allTrips = data?.pages.flatMap((page) => page.trips) ?? [];
@@ -39,35 +34,36 @@ export default function TripsPage() {
   return (
     <div className="max-w-7xl mx-auto p-8">
       <div className="mb-8">
-        <div className="flex justify-between items-start">
-          <div>
+        <div className="flex flex-col items-center gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="text-center md:text-left">
             <h1 className="text-4xl font-bold text-gray-900">Mis Viajes</h1>
             <p className="text-muted-foreground mt-1">
               Viajes asignados a ti por el administrador
             </p>
           </div>
-
-          {/* ✅ Botón exportar Excel — solo visible si hay trips */}
-          {allTrips.length > 0 && (
-            <Button
-              onClick={() => exportExcel.mutate()}
-              disabled={exportExcel.isPending}
-              variant="outline"
-              className="gap-2"
-            >
-              {exportExcel.isPending ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Exportando...
-                </>
-              ) : (
-                <>
-                  <FileSpreadsheet className="w-4 h-4" />
-                  Exportar mis gastos
-                </>
-              )}
-            </Button>
-          )}
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto mb-2">
+            {/* ✅ Botón exportar Excel — solo visible si hay trips */}
+            {allTrips.length > 0 && (
+              <Button
+                onClick={() => exportExcel.mutate()}
+                disabled={exportExcel.isPending}
+                variant="outline"
+                className="gap-2"
+              >
+                {exportExcel.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Exportando...
+                  </>
+                ) : (
+                  <>
+                    <FileSpreadsheet className="w-4 h-4" />
+                    Exportar mis gastos
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -75,11 +71,7 @@ export default function TripsPage() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allTrips.map((trip: Trip) => (
-              <TripCard
-                key={trip.id}
-                tripId={trip.id}
-                readOnly
-              />
+              <TripCard key={trip.id} tripId={trip.id} readOnly />
             ))}
           </div>
 
@@ -106,10 +98,12 @@ export default function TripsPage() {
       ) : (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <Luggage className="w-16 h-16 text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No tienes viajes asignados</h2>
+          <h2 className="text-xl font-semibold mb-2">
+            No tienes viajes asignados
+          </h2>
           <p className="text-muted-foreground max-w-sm">
-            El administrador todavía no te ha asignado ningún viaje.
-            Cuando lo haga, aparecerá aquí.
+            El administrador todavía no te ha asignado ningún viaje. Cuando lo
+            haga, aparecerá aquí.
           </p>
         </div>
       )}
