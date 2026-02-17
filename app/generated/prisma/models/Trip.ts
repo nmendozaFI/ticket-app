@@ -36,7 +36,7 @@ export type TripSumAggregateOutputType = {
 
 export type TripMinAggregateOutputType = {
   id: string | null
-  userId: string | null
+  createdByAdminId: string | null
   city: string | null
   startDate: Date | null
   endDate: Date | null
@@ -50,7 +50,7 @@ export type TripMinAggregateOutputType = {
 
 export type TripMaxAggregateOutputType = {
   id: string | null
-  userId: string | null
+  createdByAdminId: string | null
   city: string | null
   startDate: Date | null
   endDate: Date | null
@@ -64,7 +64,7 @@ export type TripMaxAggregateOutputType = {
 
 export type TripCountAggregateOutputType = {
   id: number
-  userId: number
+  createdByAdminId: number
   city: number
   startDate: number
   endDate: number
@@ -88,7 +88,7 @@ export type TripSumAggregateInputType = {
 
 export type TripMinAggregateInputType = {
   id?: true
-  userId?: true
+  createdByAdminId?: true
   city?: true
   startDate?: true
   endDate?: true
@@ -102,7 +102,7 @@ export type TripMinAggregateInputType = {
 
 export type TripMaxAggregateInputType = {
   id?: true
-  userId?: true
+  createdByAdminId?: true
   city?: true
   startDate?: true
   endDate?: true
@@ -116,7 +116,7 @@ export type TripMaxAggregateInputType = {
 
 export type TripCountAggregateInputType = {
   id?: true
-  userId?: true
+  createdByAdminId?: true
   city?: true
   startDate?: true
   endDate?: true
@@ -217,13 +217,13 @@ export type TripGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type TripGroupByOutputType = {
   id: string
-  userId: string
+  createdByAdminId: string
   city: string
   startDate: Date
   endDate: Date
   project: string | null
   notes: string | null
-  status: $Enums.TripStatus | null
+  status: $Enums.TripStatus
   totalAmount: runtime.Decimal
   createdAt: Date
   updatedAt: Date
@@ -254,33 +254,35 @@ export type TripWhereInput = {
   OR?: Prisma.TripWhereInput[]
   NOT?: Prisma.TripWhereInput | Prisma.TripWhereInput[]
   id?: Prisma.StringFilter<"Trip"> | string
-  userId?: Prisma.StringFilter<"Trip"> | string
+  createdByAdminId?: Prisma.StringFilter<"Trip"> | string
   city?: Prisma.StringFilter<"Trip"> | string
   startDate?: Prisma.DateTimeFilter<"Trip"> | Date | string
   endDate?: Prisma.DateTimeFilter<"Trip"> | Date | string
   project?: Prisma.StringNullableFilter<"Trip"> | string | null
   notes?: Prisma.StringNullableFilter<"Trip"> | string | null
-  status?: Prisma.EnumTripStatusNullableFilter<"Trip"> | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFilter<"Trip"> | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  createdByAdmin?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  assignedUsers?: Prisma.TripAssignmentListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
 }
 
 export type TripOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  createdByAdminId?: Prisma.SortOrder
   city?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   project?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
-  status?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
+  createdByAdmin?: Prisma.UserOrderByWithRelationInput
+  assignedUsers?: Prisma.TripAssignmentOrderByRelationAggregateInput
   expenses?: Prisma.ExpenseOrderByRelationAggregateInput
 }
 
@@ -289,29 +291,30 @@ export type TripWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.TripWhereInput | Prisma.TripWhereInput[]
   OR?: Prisma.TripWhereInput[]
   NOT?: Prisma.TripWhereInput | Prisma.TripWhereInput[]
-  userId?: Prisma.StringFilter<"Trip"> | string
+  createdByAdminId?: Prisma.StringFilter<"Trip"> | string
   city?: Prisma.StringFilter<"Trip"> | string
   startDate?: Prisma.DateTimeFilter<"Trip"> | Date | string
   endDate?: Prisma.DateTimeFilter<"Trip"> | Date | string
   project?: Prisma.StringNullableFilter<"Trip"> | string | null
   notes?: Prisma.StringNullableFilter<"Trip"> | string | null
-  status?: Prisma.EnumTripStatusNullableFilter<"Trip"> | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFilter<"Trip"> | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  createdByAdmin?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  assignedUsers?: Prisma.TripAssignmentListRelationFilter
   expenses?: Prisma.ExpenseListRelationFilter
 }, "id">
 
 export type TripOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  createdByAdminId?: Prisma.SortOrder
   city?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   project?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
-  status?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -327,13 +330,13 @@ export type TripScalarWhereWithAggregatesInput = {
   OR?: Prisma.TripScalarWhereWithAggregatesInput[]
   NOT?: Prisma.TripScalarWhereWithAggregatesInput | Prisma.TripScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Trip"> | string
-  userId?: Prisma.StringWithAggregatesFilter<"Trip"> | string
+  createdByAdminId?: Prisma.StringWithAggregatesFilter<"Trip"> | string
   city?: Prisma.StringWithAggregatesFilter<"Trip"> | string
   startDate?: Prisma.DateTimeWithAggregatesFilter<"Trip"> | Date | string
   endDate?: Prisma.DateTimeWithAggregatesFilter<"Trip"> | Date | string
   project?: Prisma.StringNullableWithAggregatesFilter<"Trip"> | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"Trip"> | string | null
-  status?: Prisma.EnumTripStatusNullableWithAggregatesFilter<"Trip"> | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusWithAggregatesFilter<"Trip"> | $Enums.TripStatus
   totalAmount?: Prisma.DecimalWithAggregatesFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Trip"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Trip"> | Date | string
@@ -346,26 +349,28 @@ export type TripCreateInput = {
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus | null
+  status?: $Enums.TripStatus
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutTripsInput
+  createdByAdmin: Prisma.UserCreateNestedOneWithoutCreatedTripsInput
+  assignedUsers?: Prisma.TripAssignmentCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
 }
 
 export type TripUncheckedCreateInput = {
   id?: string
-  userId: string
+  createdByAdminId: string
   city: string
   startDate: Date | string
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus | null
+  status?: $Enums.TripStatus
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  assignedUsers?: Prisma.TripAssignmentUncheckedCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
 }
 
@@ -376,38 +381,40 @@ export type TripUpdateInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutTripsNestedInput
+  createdByAdmin?: Prisma.UserUpdateOneRequiredWithoutCreatedTripsNestedInput
+  assignedUsers?: Prisma.TripAssignmentUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdByAdminId?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignedUsers?: Prisma.TripAssignmentUncheckedUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
 }
 
 export type TripCreateManyInput = {
   id?: string
-  userId: string
+  createdByAdminId: string
   city: string
   startDate: Date | string
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus | null
+  status?: $Enums.TripStatus
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -420,7 +427,7 @@ export type TripUpdateManyMutationInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -428,13 +435,13 @@ export type TripUpdateManyMutationInput = {
 
 export type TripUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdByAdminId?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -452,7 +459,7 @@ export type TripOrderByRelationAggregateInput = {
 
 export type TripCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  createdByAdminId?: Prisma.SortOrder
   city?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
@@ -470,7 +477,7 @@ export type TripAvgOrderByAggregateInput = {
 
 export type TripMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  createdByAdminId?: Prisma.SortOrder
   city?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
@@ -484,7 +491,7 @@ export type TripMaxOrderByAggregateInput = {
 
 export type TripMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
+  createdByAdminId?: Prisma.SortOrder
   city?: Prisma.SortOrder
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
@@ -505,50 +512,50 @@ export type TripScalarRelationFilter = {
   isNot?: Prisma.TripWhereInput
 }
 
-export type TripCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.TripCreateWithoutUserInput, Prisma.TripUncheckedCreateWithoutUserInput> | Prisma.TripCreateWithoutUserInput[] | Prisma.TripUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.TripCreateOrConnectWithoutUserInput | Prisma.TripCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.TripCreateManyUserInputEnvelope
+export type TripCreateNestedManyWithoutCreatedByAdminInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutCreatedByAdminInput, Prisma.TripUncheckedCreateWithoutCreatedByAdminInput> | Prisma.TripCreateWithoutCreatedByAdminInput[] | Prisma.TripUncheckedCreateWithoutCreatedByAdminInput[]
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutCreatedByAdminInput | Prisma.TripCreateOrConnectWithoutCreatedByAdminInput[]
+  createMany?: Prisma.TripCreateManyCreatedByAdminInputEnvelope
   connect?: Prisma.TripWhereUniqueInput | Prisma.TripWhereUniqueInput[]
 }
 
-export type TripUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.TripCreateWithoutUserInput, Prisma.TripUncheckedCreateWithoutUserInput> | Prisma.TripCreateWithoutUserInput[] | Prisma.TripUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.TripCreateOrConnectWithoutUserInput | Prisma.TripCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.TripCreateManyUserInputEnvelope
+export type TripUncheckedCreateNestedManyWithoutCreatedByAdminInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutCreatedByAdminInput, Prisma.TripUncheckedCreateWithoutCreatedByAdminInput> | Prisma.TripCreateWithoutCreatedByAdminInput[] | Prisma.TripUncheckedCreateWithoutCreatedByAdminInput[]
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutCreatedByAdminInput | Prisma.TripCreateOrConnectWithoutCreatedByAdminInput[]
+  createMany?: Prisma.TripCreateManyCreatedByAdminInputEnvelope
   connect?: Prisma.TripWhereUniqueInput | Prisma.TripWhereUniqueInput[]
 }
 
-export type TripUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.TripCreateWithoutUserInput, Prisma.TripUncheckedCreateWithoutUserInput> | Prisma.TripCreateWithoutUserInput[] | Prisma.TripUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.TripCreateOrConnectWithoutUserInput | Prisma.TripCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.TripUpsertWithWhereUniqueWithoutUserInput | Prisma.TripUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.TripCreateManyUserInputEnvelope
+export type TripUpdateManyWithoutCreatedByAdminNestedInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutCreatedByAdminInput, Prisma.TripUncheckedCreateWithoutCreatedByAdminInput> | Prisma.TripCreateWithoutCreatedByAdminInput[] | Prisma.TripUncheckedCreateWithoutCreatedByAdminInput[]
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutCreatedByAdminInput | Prisma.TripCreateOrConnectWithoutCreatedByAdminInput[]
+  upsert?: Prisma.TripUpsertWithWhereUniqueWithoutCreatedByAdminInput | Prisma.TripUpsertWithWhereUniqueWithoutCreatedByAdminInput[]
+  createMany?: Prisma.TripCreateManyCreatedByAdminInputEnvelope
   set?: Prisma.TripWhereUniqueInput | Prisma.TripWhereUniqueInput[]
   disconnect?: Prisma.TripWhereUniqueInput | Prisma.TripWhereUniqueInput[]
   delete?: Prisma.TripWhereUniqueInput | Prisma.TripWhereUniqueInput[]
   connect?: Prisma.TripWhereUniqueInput | Prisma.TripWhereUniqueInput[]
-  update?: Prisma.TripUpdateWithWhereUniqueWithoutUserInput | Prisma.TripUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.TripUpdateManyWithWhereWithoutUserInput | Prisma.TripUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.TripUpdateWithWhereUniqueWithoutCreatedByAdminInput | Prisma.TripUpdateWithWhereUniqueWithoutCreatedByAdminInput[]
+  updateMany?: Prisma.TripUpdateManyWithWhereWithoutCreatedByAdminInput | Prisma.TripUpdateManyWithWhereWithoutCreatedByAdminInput[]
   deleteMany?: Prisma.TripScalarWhereInput | Prisma.TripScalarWhereInput[]
 }
 
-export type TripUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.TripCreateWithoutUserInput, Prisma.TripUncheckedCreateWithoutUserInput> | Prisma.TripCreateWithoutUserInput[] | Prisma.TripUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.TripCreateOrConnectWithoutUserInput | Prisma.TripCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.TripUpsertWithWhereUniqueWithoutUserInput | Prisma.TripUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.TripCreateManyUserInputEnvelope
+export type TripUncheckedUpdateManyWithoutCreatedByAdminNestedInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutCreatedByAdminInput, Prisma.TripUncheckedCreateWithoutCreatedByAdminInput> | Prisma.TripCreateWithoutCreatedByAdminInput[] | Prisma.TripUncheckedCreateWithoutCreatedByAdminInput[]
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutCreatedByAdminInput | Prisma.TripCreateOrConnectWithoutCreatedByAdminInput[]
+  upsert?: Prisma.TripUpsertWithWhereUniqueWithoutCreatedByAdminInput | Prisma.TripUpsertWithWhereUniqueWithoutCreatedByAdminInput[]
+  createMany?: Prisma.TripCreateManyCreatedByAdminInputEnvelope
   set?: Prisma.TripWhereUniqueInput | Prisma.TripWhereUniqueInput[]
   disconnect?: Prisma.TripWhereUniqueInput | Prisma.TripWhereUniqueInput[]
   delete?: Prisma.TripWhereUniqueInput | Prisma.TripWhereUniqueInput[]
   connect?: Prisma.TripWhereUniqueInput | Prisma.TripWhereUniqueInput[]
-  update?: Prisma.TripUpdateWithWhereUniqueWithoutUserInput | Prisma.TripUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.TripUpdateManyWithWhereWithoutUserInput | Prisma.TripUpdateManyWithWhereWithoutUserInput[]
+  update?: Prisma.TripUpdateWithWhereUniqueWithoutCreatedByAdminInput | Prisma.TripUpdateWithWhereUniqueWithoutCreatedByAdminInput[]
+  updateMany?: Prisma.TripUpdateManyWithWhereWithoutCreatedByAdminInput | Prisma.TripUpdateManyWithWhereWithoutCreatedByAdminInput[]
   deleteMany?: Prisma.TripScalarWhereInput | Prisma.TripScalarWhereInput[]
 }
 
-export type NullableEnumTripStatusFieldUpdateOperationsInput = {
-  set?: $Enums.TripStatus | null
+export type EnumTripStatusFieldUpdateOperationsInput = {
+  set?: $Enums.TripStatus
 }
 
 export type DecimalFieldUpdateOperationsInput = {
@@ -557,6 +564,20 @@ export type DecimalFieldUpdateOperationsInput = {
   decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
   multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type TripCreateNestedOneWithoutAssignedUsersInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutAssignedUsersInput, Prisma.TripUncheckedCreateWithoutAssignedUsersInput>
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutAssignedUsersInput
+  connect?: Prisma.TripWhereUniqueInput
+}
+
+export type TripUpdateOneRequiredWithoutAssignedUsersNestedInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutAssignedUsersInput, Prisma.TripUncheckedCreateWithoutAssignedUsersInput>
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutAssignedUsersInput
+  upsert?: Prisma.TripUpsertWithoutAssignedUsersInput
+  connect?: Prisma.TripWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TripUpdateToOneWithWhereWithoutAssignedUsersInput, Prisma.TripUpdateWithoutAssignedUsersInput>, Prisma.TripUncheckedUpdateWithoutAssignedUsersInput>
 }
 
 export type TripCreateNestedOneWithoutExpensesInput = {
@@ -573,58 +594,60 @@ export type TripUpdateOneRequiredWithoutExpensesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TripUpdateToOneWithWhereWithoutExpensesInput, Prisma.TripUpdateWithoutExpensesInput>, Prisma.TripUncheckedUpdateWithoutExpensesInput>
 }
 
-export type TripCreateWithoutUserInput = {
+export type TripCreateWithoutCreatedByAdminInput = {
   id?: string
   city: string
   startDate: Date | string
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus | null
+  status?: $Enums.TripStatus
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  assignedUsers?: Prisma.TripAssignmentCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
 }
 
-export type TripUncheckedCreateWithoutUserInput = {
+export type TripUncheckedCreateWithoutCreatedByAdminInput = {
   id?: string
   city: string
   startDate: Date | string
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus | null
+  status?: $Enums.TripStatus
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  assignedUsers?: Prisma.TripAssignmentUncheckedCreateNestedManyWithoutTripInput
   expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
 }
 
-export type TripCreateOrConnectWithoutUserInput = {
+export type TripCreateOrConnectWithoutCreatedByAdminInput = {
   where: Prisma.TripWhereUniqueInput
-  create: Prisma.XOR<Prisma.TripCreateWithoutUserInput, Prisma.TripUncheckedCreateWithoutUserInput>
+  create: Prisma.XOR<Prisma.TripCreateWithoutCreatedByAdminInput, Prisma.TripUncheckedCreateWithoutCreatedByAdminInput>
 }
 
-export type TripCreateManyUserInputEnvelope = {
-  data: Prisma.TripCreateManyUserInput | Prisma.TripCreateManyUserInput[]
+export type TripCreateManyCreatedByAdminInputEnvelope = {
+  data: Prisma.TripCreateManyCreatedByAdminInput | Prisma.TripCreateManyCreatedByAdminInput[]
   skipDuplicates?: boolean
 }
 
-export type TripUpsertWithWhereUniqueWithoutUserInput = {
+export type TripUpsertWithWhereUniqueWithoutCreatedByAdminInput = {
   where: Prisma.TripWhereUniqueInput
-  update: Prisma.XOR<Prisma.TripUpdateWithoutUserInput, Prisma.TripUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.TripCreateWithoutUserInput, Prisma.TripUncheckedCreateWithoutUserInput>
+  update: Prisma.XOR<Prisma.TripUpdateWithoutCreatedByAdminInput, Prisma.TripUncheckedUpdateWithoutCreatedByAdminInput>
+  create: Prisma.XOR<Prisma.TripCreateWithoutCreatedByAdminInput, Prisma.TripUncheckedCreateWithoutCreatedByAdminInput>
 }
 
-export type TripUpdateWithWhereUniqueWithoutUserInput = {
+export type TripUpdateWithWhereUniqueWithoutCreatedByAdminInput = {
   where: Prisma.TripWhereUniqueInput
-  data: Prisma.XOR<Prisma.TripUpdateWithoutUserInput, Prisma.TripUncheckedUpdateWithoutUserInput>
+  data: Prisma.XOR<Prisma.TripUpdateWithoutCreatedByAdminInput, Prisma.TripUncheckedUpdateWithoutCreatedByAdminInput>
 }
 
-export type TripUpdateManyWithWhereWithoutUserInput = {
+export type TripUpdateManyWithWhereWithoutCreatedByAdminInput = {
   where: Prisma.TripScalarWhereInput
-  data: Prisma.XOR<Prisma.TripUpdateManyMutationInput, Prisma.TripUncheckedUpdateManyWithoutUserInput>
+  data: Prisma.XOR<Prisma.TripUpdateManyMutationInput, Prisma.TripUncheckedUpdateManyWithoutCreatedByAdminInput>
 }
 
 export type TripScalarWhereInput = {
@@ -632,16 +655,92 @@ export type TripScalarWhereInput = {
   OR?: Prisma.TripScalarWhereInput[]
   NOT?: Prisma.TripScalarWhereInput | Prisma.TripScalarWhereInput[]
   id?: Prisma.StringFilter<"Trip"> | string
-  userId?: Prisma.StringFilter<"Trip"> | string
+  createdByAdminId?: Prisma.StringFilter<"Trip"> | string
   city?: Prisma.StringFilter<"Trip"> | string
   startDate?: Prisma.DateTimeFilter<"Trip"> | Date | string
   endDate?: Prisma.DateTimeFilter<"Trip"> | Date | string
   project?: Prisma.StringNullableFilter<"Trip"> | string | null
   notes?: Prisma.StringNullableFilter<"Trip"> | string | null
-  status?: Prisma.EnumTripStatusNullableFilter<"Trip"> | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFilter<"Trip"> | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFilter<"Trip"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Trip"> | Date | string
+}
+
+export type TripCreateWithoutAssignedUsersInput = {
+  id?: string
+  city: string
+  startDate: Date | string
+  endDate: Date | string
+  project?: string | null
+  notes?: string | null
+  status?: $Enums.TripStatus
+  totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdByAdmin: Prisma.UserCreateNestedOneWithoutCreatedTripsInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutTripInput
+}
+
+export type TripUncheckedCreateWithoutAssignedUsersInput = {
+  id?: string
+  createdByAdminId: string
+  city: string
+  startDate: Date | string
+  endDate: Date | string
+  project?: string | null
+  notes?: string | null
+  status?: $Enums.TripStatus
+  totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutTripInput
+}
+
+export type TripCreateOrConnectWithoutAssignedUsersInput = {
+  where: Prisma.TripWhereUniqueInput
+  create: Prisma.XOR<Prisma.TripCreateWithoutAssignedUsersInput, Prisma.TripUncheckedCreateWithoutAssignedUsersInput>
+}
+
+export type TripUpsertWithoutAssignedUsersInput = {
+  update: Prisma.XOR<Prisma.TripUpdateWithoutAssignedUsersInput, Prisma.TripUncheckedUpdateWithoutAssignedUsersInput>
+  create: Prisma.XOR<Prisma.TripCreateWithoutAssignedUsersInput, Prisma.TripUncheckedCreateWithoutAssignedUsersInput>
+  where?: Prisma.TripWhereInput
+}
+
+export type TripUpdateToOneWithWhereWithoutAssignedUsersInput = {
+  where?: Prisma.TripWhereInput
+  data: Prisma.XOR<Prisma.TripUpdateWithoutAssignedUsersInput, Prisma.TripUncheckedUpdateWithoutAssignedUsersInput>
+}
+
+export type TripUpdateWithoutAssignedUsersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdByAdmin?: Prisma.UserUpdateOneRequiredWithoutCreatedTripsNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
+}
+
+export type TripUncheckedUpdateWithoutAssignedUsersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  createdByAdminId?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
+  totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
 }
 
 export type TripCreateWithoutExpensesInput = {
@@ -651,25 +750,27 @@ export type TripCreateWithoutExpensesInput = {
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus | null
+  status?: $Enums.TripStatus
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutTripsInput
+  createdByAdmin: Prisma.UserCreateNestedOneWithoutCreatedTripsInput
+  assignedUsers?: Prisma.TripAssignmentCreateNestedManyWithoutTripInput
 }
 
 export type TripUncheckedCreateWithoutExpensesInput = {
   id?: string
-  userId: string
+  createdByAdminId: string
   city: string
   startDate: Date | string
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus | null
+  status?: $Enums.TripStatus
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  assignedUsers?: Prisma.TripAssignmentUncheckedCreateNestedManyWithoutTripInput
 }
 
 export type TripCreateOrConnectWithoutExpensesInput = {
@@ -695,76 +796,80 @@ export type TripUpdateWithoutExpensesInput = {
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutTripsNestedInput
+  createdByAdmin?: Prisma.UserUpdateOneRequiredWithoutCreatedTripsNestedInput
+  assignedUsers?: Prisma.TripAssignmentUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateWithoutExpensesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdByAdminId?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignedUsers?: Prisma.TripAssignmentUncheckedUpdateManyWithoutTripNestedInput
 }
 
-export type TripCreateManyUserInput = {
+export type TripCreateManyCreatedByAdminInput = {
   id?: string
   city: string
   startDate: Date | string
   endDate: Date | string
   project?: string | null
   notes?: string | null
-  status?: $Enums.TripStatus | null
+  status?: $Enums.TripStatus
   totalAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
-export type TripUpdateWithoutUserInput = {
+export type TripUpdateWithoutCreatedByAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignedUsers?: Prisma.TripAssignmentUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUpdateManyWithoutTripNestedInput
 }
 
-export type TripUncheckedUpdateWithoutUserInput = {
+export type TripUncheckedUpdateWithoutCreatedByAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignedUsers?: Prisma.TripAssignmentUncheckedUpdateManyWithoutTripNestedInput
   expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutTripNestedInput
 }
 
-export type TripUncheckedUpdateManyWithoutUserInput = {
+export type TripUncheckedUpdateManyWithoutCreatedByAdminInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   city?: Prisma.StringFieldUpdateOperationsInput | string
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.NullableEnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus | null
+  status?: Prisma.EnumTripStatusFieldUpdateOperationsInput | $Enums.TripStatus
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -776,10 +881,12 @@ export type TripUncheckedUpdateManyWithoutUserInput = {
  */
 
 export type TripCountOutputType = {
+  assignedUsers: number
   expenses: number
 }
 
 export type TripCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  assignedUsers?: boolean | TripCountOutputTypeCountAssignedUsersArgs
   expenses?: boolean | TripCountOutputTypeCountExpensesArgs
 }
 
@@ -796,6 +903,13 @@ export type TripCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * TripCountOutputType without action
  */
+export type TripCountOutputTypeCountAssignedUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TripAssignmentWhereInput
+}
+
+/**
+ * TripCountOutputType without action
+ */
 export type TripCountOutputTypeCountExpensesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ExpenseWhereInput
 }
@@ -803,7 +917,7 @@ export type TripCountOutputTypeCountExpensesArgs<ExtArgs extends runtime.Types.E
 
 export type TripSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
+  createdByAdminId?: boolean
   city?: boolean
   startDate?: boolean
   endDate?: boolean
@@ -813,14 +927,15 @@ export type TripSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   totalAmount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  createdByAdmin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignedUsers?: boolean | Prisma.Trip$assignedUsersArgs<ExtArgs>
   expenses?: boolean | Prisma.Trip$expensesArgs<ExtArgs>
   _count?: boolean | Prisma.TripCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["trip"]>
 
 export type TripSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
+  createdByAdminId?: boolean
   city?: boolean
   startDate?: boolean
   endDate?: boolean
@@ -830,12 +945,12 @@ export type TripSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   totalAmount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  createdByAdmin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["trip"]>
 
 export type TripSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
+  createdByAdminId?: boolean
   city?: boolean
   startDate?: boolean
   endDate?: boolean
@@ -845,12 +960,12 @@ export type TripSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   totalAmount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  createdByAdmin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["trip"]>
 
 export type TripSelectScalar = {
   id?: boolean
-  userId?: boolean
+  createdByAdminId?: boolean
   city?: boolean
   startDate?: boolean
   endDate?: boolean
@@ -862,34 +977,36 @@ export type TripSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TripOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "city" | "startDate" | "endDate" | "project" | "notes" | "status" | "totalAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["trip"]>
+export type TripOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "createdByAdminId" | "city" | "startDate" | "endDate" | "project" | "notes" | "status" | "totalAmount" | "createdAt" | "updatedAt", ExtArgs["result"]["trip"]>
 export type TripInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  createdByAdmin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignedUsers?: boolean | Prisma.Trip$assignedUsersArgs<ExtArgs>
   expenses?: boolean | Prisma.Trip$expensesArgs<ExtArgs>
   _count?: boolean | Prisma.TripCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TripIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  createdByAdmin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type TripIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  createdByAdmin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $TripPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Trip"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
+    createdByAdmin: Prisma.$UserPayload<ExtArgs>
+    assignedUsers: Prisma.$TripAssignmentPayload<ExtArgs>[]
     expenses: Prisma.$ExpensePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    userId: string
+    createdByAdminId: string
     city: string
     startDate: Date
     endDate: Date
     project: string | null
     notes: string | null
-    status: $Enums.TripStatus | null
+    status: $Enums.TripStatus
     totalAmount: runtime.Decimal
     createdAt: Date
     updatedAt: Date
@@ -1287,7 +1404,8 @@ readonly fields: TripFieldRefs;
  */
 export interface Prisma__TripClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  createdByAdmin<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  assignedUsers<T extends Prisma.Trip$assignedUsersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$assignedUsersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TripAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   expenses<T extends Prisma.Trip$expensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$expensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1319,7 +1437,7 @@ export interface Prisma__TripClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface TripFieldRefs {
   readonly id: Prisma.FieldRef<"Trip", 'String'>
-  readonly userId: Prisma.FieldRef<"Trip", 'String'>
+  readonly createdByAdminId: Prisma.FieldRef<"Trip", 'String'>
   readonly city: Prisma.FieldRef<"Trip", 'String'>
   readonly startDate: Prisma.FieldRef<"Trip", 'DateTime'>
   readonly endDate: Prisma.FieldRef<"Trip", 'DateTime'>
@@ -1722,6 +1840,30 @@ export type TripDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Trips to delete.
    */
   limit?: number
+}
+
+/**
+ * Trip.assignedUsers
+ */
+export type Trip$assignedUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TripAssignment
+   */
+  select?: Prisma.TripAssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TripAssignment
+   */
+  omit?: Prisma.TripAssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TripAssignmentInclude<ExtArgs> | null
+  where?: Prisma.TripAssignmentWhereInput
+  orderBy?: Prisma.TripAssignmentOrderByWithRelationInput | Prisma.TripAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.TripAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TripAssignmentScalarFieldEnum | Prisma.TripAssignmentScalarFieldEnum[]
 }
 
 /**

@@ -7,40 +7,44 @@ import { ZodError } from "zod";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await auth.api.getSession({ headers: await headers() });
 
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ✅ Obtener parámetros de paginación
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "9");
     const skip = (page - 1) * limit;
 
-    // ✅ Consulta con paginación
-    const [trips, totalCount] = await Promise.all([
-      prisma.trip.findMany({
-        where: {
+    // ✅ USER solo ve viajes asignados a él
+    const whereClause = {
+      assignedUsers: {
+        some: {
           userId: session.user.id,
         },
+      },
+    };
+
+    const [trips, totalCount] = await Promise.all([
+      prisma.trip.findMany({
+        where: whereClause,
         include: {
+          assignedUsers: {
+            include: {
+              user: {
+                select: { id: true, name: true, email: true },
+              },
+            },
+          },
           expenses: true,
         },
-        orderBy: {
-          createdAt: "desc",
-        },
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit,
       }),
-      prisma.trip.count({
-        where: {
-          userId: session.user.id,
-        },
-      }),
+      prisma.trip.count({ where: whereClause }),
     ]);
 
     return NextResponse.json({
@@ -55,38 +59,59 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching trips:", error);
-    return NextResponse.json(
-      { error: "Error fetching trips" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error fetching trips" }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await auth.api.getSession({ headers: await headers() });
 
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // ✅ SOLO ADMIN puede crear viajes
+    if (session.user.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Only admins can create trips" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const validatedData = createTripSchema.parse(body);
 
-    const trip = await prisma.trip.create({
-      data: {
-        userId: session.user.id,
-        city: validatedData.city,
-        startDate: new Date(validatedData.startDate),
-        endDate: new Date(validatedData.endDate),
-        project: validatedData.project,
-        notes: validatedData.notes,
-      },
-      include: {
-        expenses: true,
-      },
+    // ✅ Crear viaje con asignaciones en una transacción
+    const trip = await prisma.$transaction(async (tx) => {
+      const newTrip = await tx.trip.create({
+        data: {
+          createdByAdminId: session.user.id,
+          city: validatedData.city,
+          startDate: new Date(validatedData.startDate),
+          endDate: new Date(validatedData.endDate),
+          project: validatedData.project,
+          notes: validatedData.notes,
+          // ✅ Crear asignaciones
+          assignedUsers: {
+            create: validatedData.assignedUserIds.map((userId) => ({
+              userId,
+            })),
+          },
+        },
+        include: {
+          assignedUsers: {
+            include: {
+              user: {
+                select: { id: true, name: true, email: true },
+              },
+            },
+          },
+          expenses: true,
+        },
+      });
+
+      return newTrip;
     });
 
     return NextResponse.json(trip, { status: 201 });
@@ -98,9 +123,6 @@ export async function POST(request: Request) {
       );
     }
     console.error("Error creating trip:", error);
-    return NextResponse.json(
-      { error: "Error creating trip" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error creating trip" }, { status: 500 });
   }
 }

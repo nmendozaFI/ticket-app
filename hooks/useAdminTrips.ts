@@ -1,33 +1,50 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Trip, TripStatus, PaginatedResponse } from "@/types";
+import {
+  useInfiniteQuery,
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { Trip, TripStatus, PaginatedResponse, CreateTripDto, UpdateTripDto } from "@/types";
 
-/* ===============================
-   Obtener todos los trips (ADMIN) con paginación
-================================ */
-export function useAdminTrips(page: number = 1, limit: number = 15) {
+export function useAdminTrips() {
+  return useInfiniteQuery<PaginatedResponse<Trip>>({
+    queryKey: ["adminTrips"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const res = await fetch(`/api/admin/trips?page=${pageParam}&limit=9`, {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Error fetching admin trips");
+      }
+      return res.json();
+    },
+    getNextPageParam: (lastPage) =>
+      lastPage.pagination.hasMore ? lastPage.pagination.page + 1 : undefined,
+    initialPageParam: 1,
+  });
+}
+
+export function useAdminTripsTable(page: number = 1, limit: number = 15) {
   return useQuery<PaginatedResponse<Trip>>({
-    queryKey: ["adminTrips", page, limit],
+    queryKey: ["adminTripsTable", page, limit],
     queryFn: async () => {
       const res = await fetch(`/api/admin/trips?page=${page}&limit=${limit}`, {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       });
-
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Error fetching admin trips");
       }
-
       return res.json();
     },
   });
 }
 
-/* ===============================
-   Obtener un trip específico (ADMIN)
-================================ */
 export function useAdminTrip(tripId: string) {
   return useQuery<Trip>({
     queryKey: ["adminTrip", tripId],
@@ -36,71 +53,160 @@ export function useAdminTrip(tripId: string) {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       });
-
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Error fetching trip");
       }
-
       return res.json();
     },
     enabled: !!tripId,
   });
 }
 
-/* ===============================
-   Actualizar status de un trip (ADMIN)
-================================ */
+export function useAdminTripStats() {
+  return useQuery<Trip[]>({
+    queryKey: ["adminTripStats"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/trips/stats", {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Error fetching admin trip stats");
+      }
+      return res.json();
+    },
+  });
+}
+
+export function useCreateTrip() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: CreateTripDto) => {
+      const res = await fetch("/api/trips", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Error creating trip");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminTrips"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripsTable"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripStats"] });
+      // ✅ Invalidar trips de usuario: el nuevo trip aparecerá en su lista
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+    },
+    onError: (error) => console.error("Error creating trip:", error),
+  });
+}
+
+export function useUpdateTrip() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ tripId, data }: { tripId: string; data: Partial<UpdateTripDto> }) => {
+      const res = await fetch(`/api/trips/${tripId}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Error updating trip");
+      }
+      return res.json();
+    },
+    onSuccess: (updatedTrip: Trip) => {
+      // Admin
+      queryClient.invalidateQueries({ queryKey: ["adminTrips"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripsTable"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripStats"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTrip", updatedTrip.id] });
+      queryClient.setQueryData<Trip>(["adminTrip", updatedTrip.id], updatedTrip);
+      // ✅ Usuario — puede haberse reasignado o cambiado datos que ve el user
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      queryClient.invalidateQueries({ queryKey: ["trip", updatedTrip.id] });
+    },
+    onError: (error) => console.error("Error updating trip:", error),
+  });
+}
+
+export function useDeleteTrip() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (tripId: string) => {
+      const res = await fetch(`/api/trips/${tripId}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Error deleting trip");
+      }
+      return res.json();
+    },
+    onSuccess: (_, tripId) => {
+      // Admin
+      queryClient.invalidateQueries({ queryKey: ["adminTrips"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripsTable"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripStats"] });
+      queryClient.removeQueries({ queryKey: ["adminTrip", tripId] });
+      // ✅ Usuario — el trip ya no existe, desaparece de su lista
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      queryClient.removeQueries({ queryKey: ["trip", tripId] });
+    },
+    onError: (error) => console.error("Error deleting trip:", error),
+  });
+}
+
 export function useUpdateTripStatus() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      tripId,
-      status,
-    }: {
-      tripId: string;
-      status: TripStatus;
-    }) => {
+    mutationFn: async ({ tripId, status }: { tripId: string; status: TripStatus }) => {
       const res = await fetch(`/api/admin/trips/${tripId}/status`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error || "Error updating status");
       }
-
       return res.json();
     },
     onSuccess: (updatedTrip: Trip) => {
-      // Invalidar todas las páginas
+      // Admin
       queryClient.invalidateQueries({ queryKey: ["adminTrips"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripsTable"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripStats"] });
       queryClient.invalidateQueries({ queryKey: ["adminTrip", updatedTrip.id] });
       queryClient.setQueryData<Trip>(["adminTrip", updatedTrip.id], updatedTrip);
+      // ✅ Usuario — ve el nuevo status en su card inmediatamente
+      queryClient.invalidateQueries({ queryKey: ["trips"] });
+      queryClient.invalidateQueries({ queryKey: ["trip", updatedTrip.id] });
     },
-    onError: (error) => {
-      console.error("Error updating trip status:", error);
-    },
+    onError: (error) => console.error("Error updating trip status:", error),
   });
 }
 
-/* ===============================
-   Exportar Excel (ADMIN)
-================================ */
 export function useExportExcel() {
   return useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/admin/export", {
-        credentials: "include",
-      });
-
-      if (!res.ok) {
-        throw new Error("Error exporting Excel");
-      }
+      const res = await fetch("/api/admin/export", { credentials: "include" });
+      if (!res.ok) throw new Error("Error exporting Excel");
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -112,30 +218,6 @@ export function useExportExcel() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     },
-    onError: (error) => {
-      console.error("Error exporting Excel:", error);
-    },
-  });
-}
-
-/* ===============================
-   Obtener TODOS los trips para stats (ADMIN)
-================================ */
-export function useAdminTripStats() {
-  return useQuery<Trip[]>({
-    queryKey: ["adminTripStats"],
-    queryFn: async () => {
-      const res = await fetch("/api/admin/trips/stats", {
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || "Error fetching admin trip stats");
-      }
-
-      return res.json();
-    },
+    onError: (error) => console.error("Error exporting Excel:", error),
   });
 }

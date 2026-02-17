@@ -7,31 +7,32 @@ type Params = {
   params: Promise<{ tripId: string }>;
 };
 
+// ✅ Include reutilizable — TripAssignment → user → campos
+const tripInclude = {
+  assignedUsers: {
+    include: {
+      user: {
+        select: { id: true, name: true, email: true },
+      },
+    },
+  },
+  expenses: {
+    orderBy: { date: "desc" as const },
+  },
+} as const;
+
 export async function GET(_: Request, { params }: Params) {
   try {
     const { tripId } = await params;
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await auth.api.getSession({ headers: await headers() });
 
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const trip = await prisma.trip.findUnique({
-      where: {
-        id: tripId,
-      },
-      include: {
-        user: {
-          select: { id: true, name: true, email: true },
-        },
-        expenses: {
-          orderBy: {
-            date: "desc",
-          },
-        },
-      },
+      where: { id: tripId },
+      include: tripInclude,
     });
 
     if (!trip) {
@@ -41,9 +42,6 @@ export async function GET(_: Request, { params }: Params) {
     return NextResponse.json(trip);
   } catch (error) {
     console.error("Error fetching admin trip:", error);
-    return NextResponse.json(
-      { error: "Error fetching trip" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error fetching trip" }, { status: 500 });
   }
 }

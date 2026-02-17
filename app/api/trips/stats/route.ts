@@ -16,22 +16,28 @@ export async function GET() {
     // ✅ Obtener TODOS los trips del usuario para stats
     const trips = await prisma.trip.findMany({
       where: {
-        userId: session.user.id,
+        assignedUsers: {
+          some: {
+            userId: session.user.id,
+          },
+        },
       },
       include: {
+        assignedUsers: {
+          include: {
+            user: { select: { id: true, name: true, email: true } },
+          },
+        },
         expenses: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
-
     return NextResponse.json(trips);
   } catch (error) {
     console.error("Error fetching trip stats:", error);
     return NextResponse.json(
       { error: "Error fetching trip stats" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

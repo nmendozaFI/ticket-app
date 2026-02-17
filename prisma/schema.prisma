@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client"
   output   = "../app/generated/prisma"
@@ -24,11 +23,87 @@ model User {
   role          UserRole  @default(USER)
   sessions      Session[]
   accounts      Account[]
-  trips         Trip[]
+
+  // ✅ NUEVO: viajes creados por este admin
+  createdTrips    Trip[]           @relation("AdminTrips")
+  // ✅ NUEVO: asignaciones de viajes
+  tripAssignments TripAssignment[]
 
   @@map("user")
 }
 
+enum TripStatus {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+}
+
+model Trip {
+  id        String     @id @default(cuid())
+  
+  // ✅ NUEVO: quien creó el viaje (siempre admin)
+  createdByAdminId String
+  createdByAdmin   User   @relation("AdminTrips", fields: [createdByAdminId], references: [id])
+
+  city      String
+  startDate DateTime
+  endDate   DateTime
+  project   String?
+  notes     String?
+  status    TripStatus @default(PENDIENTE)
+  totalAmount Decimal  @default(0)
+  
+  // ✅ NUEVO: usuarios asignados (many-to-many)
+  assignedUsers TripAssignment[]
+  expenses      Expense[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("trips")
+  @@index([createdByAdminId])
+}
+
+// ✅ NUEVO: tabla intermedia
+model TripAssignment {
+  id        String   @id @default(cuid())
+  tripId    String
+  userId    String
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([tripId, userId])
+  @@map("trip_assignments")
+  @@index([tripId])
+  @@index([userId])
+}
+
+// ✅ Añadir categoría "Billete" a Expense
+model Expense {
+  id            String   @id @default(cuid())
+  tripId        String
+  trip          Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  date          DateTime
+  amount        Decimal
+  category      String?  // Taxi, Comida, Hotel, Metrobus/Parking, Gasolina, Billete ← NUEVO
+  vendor        String?
+  description   String?
+  receiptUrl    String?
+  invoiceNumber String?
+  paymentMethod String?
+  
+  // ✅ NUEVO: gastos creados por admin (billete) son visibles pero editables por user
+  createdByAdminId String? // null = creado por user, filled = creado por admin
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("expenses")
+  @@index([tripId])
+}
+
+// El resto (Session, Account, Verification) sin cambios...
 model Session {
   id        String   @id
   expiresAt DateTime
@@ -75,49 +150,4 @@ model Verification {
 
   @@map("verification")
   @@index([identifier])
-}
-
-// TABLAS PARA LA APLICACION DE TICKETS 
-enum TripStatus {
-  PENDIENTE
-  APROBADO
-  RECHAZADO
-}
-
-model Trip {
-  id        String      @id @default(cuid())
-  userId    String
-  user      User        @relation(fields: [userId], references: [id])
-  city      String
-  startDate DateTime
-  endDate   DateTime
-  project   String?     
-  notes     String?
-  status    TripStatus? @default(PENDIENTE)  
-  totalAmount Decimal    @default(0)
-  expenses  Expense[]
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-
-  @@map("trips")
-  @@index([userId])
-}
-
-model Expense {
-  id        String   @id @default(cuid())
-  tripId    String
-  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  date      DateTime
-  amount    Decimal
-  category  String?  // comida, hotel, transporte, etc.
-  vendor    String?  // opcional (restaurante, taxi...)
-  description String?
-  receiptUrl String? // imagen
-  invoiceNumber String?  // Nº Factura
-  paymentMethod String?  // Tarjeta, Efectivo, Transferencia, Domiciliacion
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("expenses")
-  @@index([tripId])
 }

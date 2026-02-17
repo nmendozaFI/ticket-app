@@ -1,7 +1,7 @@
 "use client";
 
 import { useUserContext } from "@/context/userContext";
-import { CreateTripDto, UpdateTripDto, Trip, PaginatedResponse } from "@/types";
+import {  UpdateTripDto, Trip, PaginatedResponse } from "@/types";
 import {
   useInfiniteQuery,
   useQuery,
@@ -70,37 +70,37 @@ export function useTrip(tripId: string) {
 /* ===============================
    Crear viaje
 ================================ */
-export function useCreateTrip() {
-  const queryClient = useQueryClient();
-  const { user } = useUserContext();
+// export function useCreateTrip() {
+//   const queryClient = useQueryClient();
+//   const { user } = useUserContext();
 
-  return useMutation({
-    mutationFn: async (data: CreateTripDto) => {
-      if (!user?.id) throw new Error("No user");
+//   return useMutation({
+//     mutationFn: async (data: CreateTripDto) => {
+//       if (!user?.id) throw new Error("No user");
 
-      const res = await fetch("/api/trips", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+//       const res = await fetch("/api/trips", {
+//         method: "POST",
+//         credentials: "include",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(data),
+//       });
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || "Error creating trip");
-      }
+//       if (!res.ok) {
+//         const error = await res.json();
+//         throw new Error(error.error || "Error creating trip");
+//       }
 
-      return res.json();
-    },
-    onSuccess: () => {
-      // Invalidar para refrescar la lista
-      queryClient.invalidateQueries({ queryKey: ["trips", user!.id] });
-    },
-    onError: (error) => {
-      console.error("Error creating trip:", error);
-    },
-  });
-}
+//       return res.json();
+//     },
+//     onSuccess: () => {
+//       // Invalidar para refrescar la lista
+//       queryClient.invalidateQueries({ queryKey: ["trips", user!.id] });
+//     },
+//     onError: (error) => {
+//       console.error("Error creating trip:", error);
+//     },
+//   });
+// }
 
 /* ===============================
    Editar viaje
@@ -202,5 +202,35 @@ export function useTripStats() {
       return res.json();
     },
     enabled: !!user?.id,
+  });
+}
+
+/* ===============================
+   ✅ NUEVO: Exportar Excel del usuario (solo sus viajes)
+================================ */
+export function useExportUserExcel() {
+  return useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/trips/export", {
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        throw new Error("Error exporting Excel");
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `mis-gastos-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    },
+    onError: (error) => {
+      console.error("Error exporting user Excel:", error);
+    },
   });
 }

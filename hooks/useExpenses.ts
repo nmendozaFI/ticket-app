@@ -38,8 +38,6 @@ export function useCreateExpense(tripId: string) {
 
   return useMutation({
     mutationFn: async (data: Omit<CreateExpenseDto, "tripId">) => {
-      if (!user?.id) throw new Error("No user");
-      
       const res = await fetch(`/api/trips/${tripId}/expenses`, {
         method: "POST",
         credentials: "include",
@@ -55,17 +53,23 @@ export function useCreateExpense(tripId: string) {
       return res.json();
     },
     onSuccess: (newExpense: Expense) => {
-      // Invalidar expenses del trip
+      // Queries de usuario
       queryClient.invalidateQueries({ queryKey: ["expenses", tripId] });
-      
-      // Invalidar el trip para actualizar totalAmount
       queryClient.invalidateQueries({ queryKey: ["trip", tripId] });
-      queryClient.invalidateQueries({ queryKey: ["trips", user!.id] });
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: ["trips", user.id] });
+      }
       
-      // Actualizar cache de expenses
-      queryClient.setQueryData<Expense[]>(["expenses", tripId], (oldExpenses) => {
-        return oldExpenses ? [newExpense, ...oldExpenses] : [newExpense];
-      });
+      // ✅ Queries de admin — para que se refresque si el admin está viendo el trip
+      queryClient.invalidateQueries({ queryKey: ["adminTrip", tripId] });
+      queryClient.invalidateQueries({ queryKey: ["adminTrips"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripsTable"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripStats"] });
+
+      // Actualizar cache local
+      queryClient.setQueryData<Expense[]>(["expenses", tripId], (old) =>
+        old ? [newExpense, ...old] : [newExpense]
+      );
     },
     onError: (error) => {
       console.error("Error creating expense:", error);
@@ -88,8 +92,6 @@ export function useUpdateExpense(tripId: string) {
       expenseId: string;
       data: Partial<UpdateExpenseDto>;
     }) => {
-      if (!user?.id) throw new Error("No user");
-      
       const res = await fetch(`/api/trips/${tripId}/expenses/${expenseId}`, {
         method: "PUT",
         credentials: "include",
@@ -105,17 +107,23 @@ export function useUpdateExpense(tripId: string) {
       return res.json();
     },
     onSuccess: (updatedExpense: Expense) => {
-      // Invalidar todas las queries relacionadas
+      // Queries de usuario
       queryClient.invalidateQueries({ queryKey: ["expenses", tripId] });
       queryClient.invalidateQueries({ queryKey: ["trip", tripId] });
-      queryClient.invalidateQueries({ queryKey: ["trips", user!.id] });
-      
-      // Actualizar cache
-      queryClient.setQueryData<Expense[]>(["expenses", tripId], (oldExpenses) => {
-        if (!oldExpenses) return [updatedExpense];
-        return oldExpenses.map((expense) =>
-          expense.id === updatedExpense.id ? updatedExpense : expense
-        );
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: ["trips", user.id] });
+      }
+
+      // ✅ Queries de admin
+      queryClient.invalidateQueries({ queryKey: ["adminTrip", tripId] });
+      queryClient.invalidateQueries({ queryKey: ["adminTrips"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripsTable"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripStats"] });
+
+      // Actualizar cache local
+      queryClient.setQueryData<Expense[]>(["expenses", tripId], (old) => {
+        if (!old) return [updatedExpense];
+        return old.map((e) => e.id === updatedExpense.id ? updatedExpense : e);
       });
     },
     onError: (error) => {
@@ -133,8 +141,6 @@ export function useDeleteExpense(tripId: string) {
 
   return useMutation({
     mutationFn: async (expenseId: string) => {
-      if (!user?.id) throw new Error("No user");
-      
       const res = await fetch(`/api/trips/${tripId}/expenses/${expenseId}`, {
         method: "DELETE",
         credentials: "include",
@@ -149,15 +155,23 @@ export function useDeleteExpense(tripId: string) {
       return res.json();
     },
     onSuccess: (_, expenseId) => {
-      // Invalidar queries
+      // Queries de usuario
       queryClient.invalidateQueries({ queryKey: ["expenses", tripId] });
       queryClient.invalidateQueries({ queryKey: ["trip", tripId] });
-      queryClient.invalidateQueries({ queryKey: ["trips", user!.id] });
-      
-      // Actualizar cache
-      queryClient.setQueryData<Expense[]>(["expenses", tripId], (oldExpenses) => {
-        return oldExpenses ? oldExpenses.filter((exp) => exp.id !== expenseId) : [];
-      });
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: ["trips", user.id] });
+      }
+
+      // ✅ Queries de admin
+      queryClient.invalidateQueries({ queryKey: ["adminTrip", tripId] });
+      queryClient.invalidateQueries({ queryKey: ["adminTrips"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripsTable"] });
+      queryClient.invalidateQueries({ queryKey: ["adminTripStats"] });
+
+      // Actualizar cache local
+      queryClient.setQueryData<Expense[]>(["expenses", tripId], (old) =>
+        old ? old.filter((e) => e.id !== expenseId) : []
+      );
     },
     onError: (error) => {
       console.error("Error deleting expense:", error);

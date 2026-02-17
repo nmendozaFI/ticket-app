@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const { data: allTrips, isLoading: loadingTrips } = useAdminTripStats(); // ✅ Hook sin paginación
+  const { data: allTrips, isLoading: loadingTrips } = useAdminTripStats();
   const { users, isLoading: loadingUsers } = useUsers();
   const isLoading = loadingTrips || loadingUsers;
 
@@ -22,28 +22,34 @@ export default function AdminDashboard() {
   // Contar por estado
   const tripsByStatus = {
     PENDIENTE: allTrips?.filter((t) => t.status === "PENDIENTE").length ?? 0,
-    APROBADO: allTrips?.filter((t) => t.status === "APROBADO").length ?? 0,
+    APROBADO:  allTrips?.filter((t) => t.status === "APROBADO").length ?? 0,
     RECHAZADO: allTrips?.filter((t) => t.status === "RECHAZADO").length ?? 0,
   };
 
-  // Gasto por usuario
+  // ✅ Gasto por usuario — ahora iteramos assignedUsers (array)
+  // Un trip puede estar asignado a varios usuarios: lo contamos para cada uno
   const spendByUser = (() => {
-    const map = new Map<string, { name: string; total: number; trips: number }>();
+    const map = new Map<string, { name: string; email: string; total: number; trips: number }>();
+
     allTrips?.forEach((trip) => {
-      const userId = trip.userId;
       const amount = Number(trip.totalAmount ?? 0);
-      const existing = map.get(userId);
-      if (existing) {
-        existing.total += amount;
-        existing.trips += 1;
-      } else {
-        map.set(userId, {
-          name: trip.user?.name || "Usuario desconocido",
-          total: amount,
-          trips: 1,
-        });
-      }
+
+      // ✅ assignedUsers es un array de TripAssignment
+      trip.assignedUsers?.forEach((assignment) => {
+        const userId = assignment.userId;
+        const name  = assignment.user?.name  ?? "Sin nombre";
+        const email = assignment.user?.email ?? "";
+
+        const existing = map.get(userId);
+        if (existing) {
+          existing.total += amount;
+          existing.trips += 1;
+        } else {
+          map.set(userId, { name, email, total: amount, trips: 1 });
+        }
+      });
     });
+
     return Array.from(map.values())
       .sort((a, b) => b.total - a.total)
       .slice(0, 5);
@@ -63,66 +69,65 @@ export default function AdminDashboard() {
   return (
     <main className="flex flex-col gap-6 p-6">
       <section className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Dashboard Administrador</h1>
-        <Button
-          variant="outline"
-          onClick={() => router.push("/trips")}
-        >
-          Ver mis viajes
-        </Button>
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard Administrador</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Resumen global de viajes y gastos
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => router.push("/admin/alltrips")}>
+            Gestionar viajes
+          </Button>
+          <Button variant="outline" onClick={() => router.push("/admin")}>
+            Ver tabla
+          </Button>
+        </div>
       </section>
 
       {/* KPIs globales */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Total viajes</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Total viajes</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-9 w-16" />
-            ) : (
+            {isLoading ? <Skeleton className="h-9 w-16" /> : (
               <p className="text-3xl font-bold">{totalTrips}</p>
             )}
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Gasto total</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Gasto total</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-9 w-32" />
-            ) : (
+            {isLoading ? <Skeleton className="h-9 w-32" /> : (
               <p className="text-3xl font-bold">
-                {totalAmount.toLocaleString("es-ES", {
-                  style: "currency",
-                  currency: "EUR",
-                })}
+                {totalAmount.toLocaleString("es-ES", { style: "currency", currency: "EUR" })}
               </p>
             )}
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Usuarios activos</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">Usuarios activos</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-9 w-12" />
-            ) : (
+            {isLoading ? <Skeleton className="h-9 w-12" /> : (
               <p className="text-3xl font-bold">{usersActivos}</p>
             )}
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Pendientes</CardTitle>
+            <CardTitle className="text-sm text-yellow-600">Pendientes</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-9 w-12" />
-            ) : (
+            {isLoading ? <Skeleton className="h-9 w-12" /> : (
               <p className="text-3xl font-bold text-yellow-600">
                 {tripsByStatus.PENDIENTE}
               </p>
@@ -131,16 +136,14 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Estados de viajes */}
+      {/* Estados */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm text-yellow-600">Pendientes</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-12" />
-            ) : (
+            {isLoading ? <Skeleton className="h-8 w-12" /> : (
               <p className="text-2xl font-bold">{tripsByStatus.PENDIENTE}</p>
             )}
           </CardContent>
@@ -150,9 +153,7 @@ export default function AdminDashboard() {
             <CardTitle className="text-sm text-green-600">Aprobados</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-12" />
-            ) : (
+            {isLoading ? <Skeleton className="h-8 w-12" /> : (
               <p className="text-2xl font-bold">{tripsByStatus.APROBADO}</p>
             )}
           </CardContent>
@@ -162,16 +163,14 @@ export default function AdminDashboard() {
             <CardTitle className="text-sm text-red-600">Rechazados</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-8 w-12" />
-            ) : (
+            {isLoading ? <Skeleton className="h-8 w-12" /> : (
               <p className="text-2xl font-bold">{tripsByStatus.RECHAZADO}</p>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Dos columnas: gasto por usuario + ciudades */}
+      {/* Gasto por usuario + ciudades */}
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -180,9 +179,7 @@ export default function AdminDashboard() {
           <CardContent>
             {isLoading ? (
               <div className="space-y-3">
-                {[...Array(5)].map((_, i) => (
-                  <Skeleton key={i} className="h-12 w-full" />
-                ))}
+                {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
               </div>
             ) : spendByUser.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">
@@ -191,21 +188,15 @@ export default function AdminDashboard() {
             ) : (
               <ul className="space-y-3">
                 {spendByUser.map((u) => (
-                  <li
-                    key={u.name}
-                    className="flex justify-between items-center py-2 border-b last:border-0"
-                  >
+                  <li key={u.email} className="flex justify-between items-center py-2 border-b last:border-0">
                     <div>
                       <span className="font-medium">{u.name}</span>
                       <p className="text-xs text-muted-foreground">
-                        {u.trips} viajes
+                        {u.email} · {u.trips} {u.trips === 1 ? "viaje" : "viajes"}
                       </p>
                     </div>
                     <span className="font-semibold">
-                      {u.total.toLocaleString("es-ES", {
-                        style: "currency",
-                        currency: "EUR",
-                      })}
+                      {u.total.toLocaleString("es-ES", { style: "currency", currency: "EUR" })}
                     </span>
                   </li>
                 ))}
@@ -221,9 +212,7 @@ export default function AdminDashboard() {
           <CardContent>
             {isLoading ? (
               <div className="space-y-3">
-                {[...Array(5)].map((_, i) => (
-                  <Skeleton key={i} className="h-12 w-full" />
-                ))}
+                {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
               </div>
             ) : topCities.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">
@@ -232,10 +221,7 @@ export default function AdminDashboard() {
             ) : (
               <ul className="space-y-3">
                 {topCities.map(([city, count]) => (
-                  <li
-                    key={city}
-                    className="flex justify-between items-center py-2 border-b last:border-0"
-                  >
+                  <li key={city} className="flex justify-between items-center py-2 border-b last:border-0">
                     <span className="font-medium">{city}</span>
                     <span className="text-muted-foreground">
                       {count} {count === 1 ? "viaje" : "viajes"}

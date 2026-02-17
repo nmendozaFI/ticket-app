@@ -60,7 +60,7 @@ export default async function RootLayout({
 
   return (
     <html lang="es" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning>
         <UserProvider initialUser={currentUser}>
           <QueryProvider>
             <Navigation />
