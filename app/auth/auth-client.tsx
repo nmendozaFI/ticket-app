@@ -217,6 +217,9 @@ export default function AuthClientPage() {
                   )}
                 </button>
               </div>
+              <p className="text-xs text-black pt-2">
+                La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una letra minúscula y un número.
+              </p>
             </div>
 
             <button
