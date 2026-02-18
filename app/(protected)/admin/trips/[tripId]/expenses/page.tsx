@@ -2,7 +2,11 @@
 
 import { use, useState } from "react";
 import { useAdminTrip, useUpdateTripStatus } from "@/hooks/useAdminTrips";
-import { useCreateExpense } from "@/hooks/useExpenses";
+import {
+  useCreateExpense,
+  useDeleteExpense,
+  useUpdateExpense,
+} from "@/hooks/useExpenses";
 import {
   Table,
   TableBody,
@@ -17,6 +21,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+// import {
+//   AlertDialog,
+//   AlertDialogAction,
+//   AlertDialogCancel,
+//   AlertDialogContent,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+// } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -26,7 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Edit3, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Expense, TripStatus } from "@/types";
@@ -41,9 +55,14 @@ export default function AdminTripExpenses({
   const { tripId } = use(params);
   const { data: trip, isLoading } = useAdminTrip(tripId);
   const updateStatus = useUpdateTripStatus();
+
   const createExpense = useCreateExpense(tripId);
+  const updateExpense = useUpdateExpense(tripId);
+  const deleteExpense = useDeleteExpense(tripId);
 
   const [isExpenseOpen, setIsExpenseOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+ 
 
   const STATUS_OPTIONS: TripStatus[] = ["PENDIENTE", "APROBADO", "RECHAZADO"];
 
@@ -62,6 +81,34 @@ export default function AdminTripExpenses({
 
   // ✅ Construir lista de usuarios asignados desde assignedUsers
   const assignedUsers = trip?.assignedUsers ?? [];
+
+  const handleCreateOrUpdate = (
+    values: Parameters<typeof ExpenseForm>[0]["onSubmit"] extends (
+      v: infer V,
+    ) => void
+      ? V
+      : never,
+  ) => {
+    if (editingExpense) {
+      updateExpense.mutate(
+        {
+          expenseId: editingExpense.id,
+          data: values,
+        },
+        {
+          onSuccess: () => {
+            setIsExpenseOpen(false);
+            setEditingExpense(null);
+          },
+        },
+      );
+    } else {
+      createExpense.mutate(values, {
+        onSuccess: () => setIsExpenseOpen(false),
+      });
+    }
+  };
+
 
   if (isLoading) {
     return (
@@ -191,7 +238,13 @@ export default function AdminTripExpenses({
           </h2>
 
           {/* ✅ Admin puede añadir gasto inicial (billete, etc.) */}
-          <Button onClick={() => setIsExpenseOpen(true)} className="gap-2">
+          <Button
+            onClick={() => {
+              setEditingExpense(null);
+              setIsExpenseOpen(true);
+            }}
+            className="gap-2"
+          >
             <Plus className="w-4 h-4" />
             Añadir Gasto
           </Button>
@@ -265,6 +318,29 @@ export default function AdminTripExpenses({
                         <span className="text-muted-foreground text-sm">-</span>
                       )}
                     </TableCell>
+                    {/* ✅ Botones editar y borrar */}
+                    <TableCell className="text-center">
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingExpense(expense);
+                            setIsExpenseOpen(true);
+                          }}
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </Button>
+                       <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteExpense.mutate(expense.id)}
+                          disabled={deleteExpense.isPending}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -281,19 +357,28 @@ export default function AdminTripExpenses({
         )}
       </div>
 
-      {/* Dialog para añadir gasto */}
-      <Dialog open={isExpenseOpen} onOpenChange={setIsExpenseOpen}>
+           {/* Dialog para añadir/editar gasto */}
+      <Dialog
+        open={isExpenseOpen}
+        onOpenChange={(open) => {
+          setIsExpenseOpen(open);
+          if (!open) setEditingExpense(null);
+        }}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Añadir Gasto</DialogTitle>
+            <DialogTitle>
+              {editingExpense ? "Editar Gasto" : "Añadir Gasto"}
+            </DialogTitle>
           </DialogHeader>
           <ExpenseForm
             tripId={tripId}
-            onSubmit={(values) => {
-              createExpense.mutate(values);
+            initialData={editingExpense}
+            onSubmit={handleCreateOrUpdate}
+            onCancel={() => {
               setIsExpenseOpen(false);
+              setEditingExpense(null);
             }}
-            onCancel={() => setIsExpenseOpen(false)}
           />
         </DialogContent>
       </Dialog>

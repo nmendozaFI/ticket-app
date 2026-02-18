@@ -31,7 +31,7 @@ type ExpenseFormValues = {
 
 interface ExpenseFormProps {
   tripId: string;
-  initialData?: Expense;
+  initialData?: Expense | null;
   onSubmit: (values: ExpenseFormValues) => void;
   onCancel: () => void;
 }

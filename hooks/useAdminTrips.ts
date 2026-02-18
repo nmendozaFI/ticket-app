@@ -113,7 +113,7 @@ export function useUpdateTrip() {
 
   return useMutation({
     mutationFn: async ({ tripId, data }: { tripId: string; data: Partial<UpdateTripDto> }) => {
-      const res = await fetch(`/api/trips/${tripId}`, {
+      const res = await fetch(`/api/admin/trips/${tripId}`, { // ← CAMBIADO
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -126,13 +126,11 @@ export function useUpdateTrip() {
       return res.json();
     },
     onSuccess: (updatedTrip: Trip) => {
-      // Admin
       queryClient.invalidateQueries({ queryKey: ["adminTrips"] });
       queryClient.invalidateQueries({ queryKey: ["adminTripsTable"] });
       queryClient.invalidateQueries({ queryKey: ["adminTripStats"] });
       queryClient.invalidateQueries({ queryKey: ["adminTrip", updatedTrip.id] });
       queryClient.setQueryData<Trip>(["adminTrip", updatedTrip.id], updatedTrip);
-      // ✅ Usuario — puede haberse reasignado o cambiado datos que ve el user
       queryClient.invalidateQueries({ queryKey: ["trips"] });
       queryClient.invalidateQueries({ queryKey: ["trip", updatedTrip.id] });
     },
@@ -140,12 +138,13 @@ export function useUpdateTrip() {
   });
 }
 
+// ✅ FIX: usar /api/admin/trips/${tripId} en lugar de /api/trips/${tripId}
 export function useDeleteTrip() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (tripId: string) => {
-      const res = await fetch(`/api/trips/${tripId}`, {
+      const res = await fetch(`/api/admin/trips/${tripId}`, { // ← CAMBIADO
         method: "DELETE",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -157,12 +156,10 @@ export function useDeleteTrip() {
       return res.json();
     },
     onSuccess: (_, tripId) => {
-      // Admin
       queryClient.invalidateQueries({ queryKey: ["adminTrips"] });
       queryClient.invalidateQueries({ queryKey: ["adminTripsTable"] });
       queryClient.invalidateQueries({ queryKey: ["adminTripStats"] });
       queryClient.removeQueries({ queryKey: ["adminTrip", tripId] });
-      // ✅ Usuario — el trip ya no existe, desaparece de su lista
       queryClient.invalidateQueries({ queryKey: ["trips"] });
       queryClient.removeQueries({ queryKey: ["trip", tripId] });
     },
