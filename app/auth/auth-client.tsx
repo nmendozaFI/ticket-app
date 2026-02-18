@@ -27,12 +27,12 @@ export default function AuthClientPage() {
   const authClient = createAuthClient();
 
   const signInMicrosoft = async () => {
-  const data = await authClient.signIn.social({
-    provider: "microsoft",
-    callbackURL: "/", 
-  });
-  console.log("Microsoft Sign-In Data:", data);
-};
+    const data = await authClient.signIn.social({
+      provider: "microsoft",
+      callbackURL: "/",
+    });
+    console.log("Microsoft Sign-In Data:", data);
+  };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,34 +44,24 @@ export default function AuthClientPage() {
       let result;
       if (isSignIn) {
         result = await signIn(email, password);
-        if (result?.user) {
-          // betterAuth suele devolver un 'user' si el login fue exitoso
-          toast.success("Inicio de sesión exitoso!");
-          clearForm();
-          router.push("/");
-        } else {
-          setError("Email o contraseña inválida. Intente de nuevo.");
-          toast.error("Error al iniciar sesión.");
-        }
       } else {
         result = await signUp(email, password, name);
-        if (result?.user) {
-          // betterAuth suele devolver un 'user' si el registro fue exitoso
-          toast.success("Cuenta creada exitosamente! Iniciando sesión...");
-          clearForm();
-          router.push("/");
-        } else {
-          setError(
-            "Error al crear la cuenta. El email ya podría estar en uso."
-          );
-          toast.error("Error al crear la cuenta.");
-        }
+      }
+
+      // Ahora maneja el nuevo formato
+      if (result.success && result.user) {
+        toast.success(isSignIn ? "¡Sesión iniciada!" : "¡Cuenta creada!");
+        clearForm();
+        router.push("/");
+      } else {
+        setError(result.error || "Error desconocido");
+        toast.error(result.error || "Error en autenticación");
       }
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Error desconocido";
-      setError(`Error de autenticación: ${errorMessage}`);
-      toast.error(`Error de autenticación: ${errorMessage}`);
+      setError(`Error: ${errorMessage}`);
+      toast.error(`Error: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +108,6 @@ export default function AuthClientPage() {
 
           {/* Social Authentication */}
           <div className="space-y-3">
-
             <button
               onClick={signInMicrosoft}
               disabled={isLoading}
