@@ -66,10 +66,14 @@ export async function PUT(request: Request, { params }: Params) {
     const updateData: Prisma.TripUpdateInput = {};
 
     if (validatedData.city !== undefined) updateData.city = validatedData.city;
-    if (validatedData.project !== undefined) updateData.project = validatedData.project;
-    if (validatedData.notes !== undefined) updateData.notes = validatedData.notes;
-    if (validatedData.status !== undefined) updateData.status = validatedData.status;
-
+    if (validatedData.project !== undefined)
+      updateData.project = validatedData.project;
+    if (validatedData.notes !== undefined)
+      updateData.notes = validatedData.notes;
+    if (validatedData.status !== undefined)
+      updateData.status = validatedData.status;
+    if (validatedData.numberInvoice !== undefined)
+      updateData.numberInvoice = validatedData.numberInvoice;
     if (validatedData.startDate !== undefined) {
       updateData.startDate = new Date(validatedData.startDate);
     }
@@ -82,7 +86,7 @@ export async function PUT(request: Request, { params }: Params) {
       await prisma.$transaction([
         prisma.tripAssignment.deleteMany({ where: { tripId } }),
         ...validatedData.assignedUserIds.map((userId) =>
-          prisma.tripAssignment.create({ data: { tripId, userId } })
+          prisma.tripAssignment.create({ data: { tripId, userId } }),
         ),
       ]);
     }
@@ -98,7 +102,7 @@ export async function PUT(request: Request, { params }: Params) {
     if (error instanceof ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error updating trip:", error);

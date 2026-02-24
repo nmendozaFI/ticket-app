@@ -52,6 +52,7 @@ model Trip {
   notes     String?
   status    TripStatus @default(PENDIENTE)
   totalAmount Decimal  @default(0)
+  numberInvoice String?
   
   // ✅ NUEVO: usuarios asignados (many-to-many)
   assignedUsers TripAssignment[]

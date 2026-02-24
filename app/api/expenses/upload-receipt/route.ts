@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import cloudinary from "@/lib/cloudinary";
+import prisma from "@/lib/db";
+import { getDayNumber } from "@/lib/utils";
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,6 +27,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // ✅ Obtener el trip para conseguir el numberInvoice
+    const trip = await prisma.trip.findUnique({
+      where: { id: tripId },
+      select: { numberInvoice: true, city: true, createdAt: true },
+    });
+
+    if (!trip) {
+      return NextResponse.json(
+        { error: "Trip not found" },
+        { status: 404 },
+      );
+    }
+
     // Convertir File a Buffer
     const arrayBuffer = await image.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -32,23 +48,29 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now();
     const originalName = image.name.replace(/\.[^/.]+$/, ""); // Sin extensión
 
-    // Subir a Cloudinary
-    // ✅ Subir a carpeta organizada: tickets/año/mes/tripId/
+    // ✅ Usar numberInvoice si existe, sino usar tripId como fallback
     const uploadDate = new Date();
     const year = uploadDate.getFullYear();
     const month = String(uploadDate.getMonth() + 1).padStart(2, "0");
+    
+    // ✅ Nombre de carpeta basado en numberInvoice o tripId + ciudad
+    const folderName = trip.numberInvoice 
+      ? trip.numberInvoice.replace(/[^a-zA-Z0-9-_]/g, "_") // Sanitizar para Cloudinary
+      : `${trip.city}_day${getDayNumber(trip.createdAt)}`; // Fallback: ciudad + primeros 8 chars del tripId
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await new Promise<any>((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
-            folder: `tickets/${year}/${month}/${tripId}`, // ✅ Estructura organizada
-            public_id: `${timestamp}_${originalName}`, // ✅ Nombre único
+            // ✅ Estructura: tickets/año/mes/numberInvoice/
+            folder: `tickets/${year}/${month}/${folderName}`,
+            public_id: `${timestamp}_${originalName}`,
             resource_type: "auto",
             format: "jpg",
             transformation: [
-              { quality: "auto:good" }, // Optimizar calidad
-              { fetch_format: "auto" }, // Formato óptimo
+              { quality: "auto:good" },
+              { fetch_format: "auto" },
             ],
           },
           (error, result) => {

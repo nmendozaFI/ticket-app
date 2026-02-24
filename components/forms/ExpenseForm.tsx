@@ -280,6 +280,7 @@ export default function ExpenseForm({
               <SelectItem value="Gasolina">Gasolina</SelectItem>
               <SelectItem value="Ave">Ave</SelectItem>
               <SelectItem value="Avion">Avion</SelectItem>
+              <SelectItem value="ComidasOficina">Escuela Formación</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -296,7 +297,7 @@ export default function ExpenseForm({
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="invoiceNumber">Nº Factura</Label>
+          <Label htmlFor="invoiceNumber">NIF/CIF</Label>
           <Input
             name="invoiceNumber"
             value={values.invoiceNumber}

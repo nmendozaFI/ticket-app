@@ -92,6 +92,7 @@ export async function POST(request: Request) {
           endDate: new Date(validatedData.endDate),
           project: validatedData.project,
           notes: validatedData.notes,
+          numberInvoice: validatedData.numberInvoice,
           // ✅ Crear asignaciones
           assignedUsers: {
             create: validatedData.assignedUserIds.map((userId) => ({

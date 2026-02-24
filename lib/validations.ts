@@ -7,8 +7,10 @@ export const createTripSchema = z.object({
   endDate: z.string().datetime().or(z.date()),
   project: z.string().optional(),
   notes: z.string().optional(),
-  assignedUserIds: z.array(z.string()).min(1, "Debes asignar al menos un usuario"), // ✅ NUEVO
-
+  assignedUserIds: z
+    .array(z.string())
+    .min(1, "Debes asignar al menos un usuario"), // ✅ NUEVO
+  numberInvoice: z.string().optional(),
 });
 
 export const updateTripSchema = z.object({
@@ -19,7 +21,8 @@ export const updateTripSchema = z.object({
   notes: z.string().optional(),
   status: z.enum(["PENDIENTE", "APROBADO", "RECHAZADO"]).optional(), // ✅ Corregido
   totalAmount: z.number().optional(),
-  assignedUserIds: z.array(z.string()).optional(), 
+  assignedUserIds: z.array(z.string()).optional(),
+  numberInvoice: z.string().optional(),
 });
 
 // Schema específico para actualizar status
@@ -35,8 +38,8 @@ export const createExpenseSchema = z.object({
   vendor: z.string().optional(),
   description: z.string().optional(),
   receiptUrl: z.string().url().optional().or(z.literal("")),
-  invoiceNumber: z.string().optional(), 
-  paymentMethod: z.string().optional(), 
+  invoiceNumber: z.string().optional(),
+  paymentMethod: z.string().optional(),
 });
 
 export const updateExpenseSchema = z.object({
@@ -46,6 +49,6 @@ export const updateExpenseSchema = z.object({
   vendor: z.string().optional(),
   description: z.string().optional(),
   receiptUrl: z.string().url().optional().or(z.literal("")),
-  invoiceNumber: z.string().optional(),  // ✅ NUEVO
-  paymentMethod: z.string().optional(),  // ✅ NUEVO
+  invoiceNumber: z.string().optional(), // ✅ NUEVO
+  paymentMethod: z.string().optional(), // ✅ NUEVO
 });

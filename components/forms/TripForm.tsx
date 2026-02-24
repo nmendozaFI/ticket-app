@@ -24,23 +24,46 @@ interface TripFormProps {
   onCancel: () => void;
 }
 
-export default function TripForm({ initialData, onSubmit, onCancel }: TripFormProps) {
+// ✅ Ciudades disponibles
+const CIUDADES = [
+  "Madrid",
+  "Barcelona",
+  "Valencia",
+  "Sevilla",
+  "Tenerife",
+  "Zaragoza",
+  "Málaga",
+  "Cádiz",
+  "Mallorca",
+  "Otros",
+];
+
+export default function TripForm({
+  initialData,
+  onSubmit,
+  onCancel,
+}: TripFormProps) {
   const { users } = useUsers();
-  
+
   // ✅ Inicializar usuarios asignados desde datos existentes
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>(
-    initialData?.assignedUsers?.map((a) => a.userId) || []
+    initialData?.assignedUsers?.map((a) => a.userId) || [],
   );
 
-  const [values, setValues] = React.useState<Omit<TripFormDto, "assignedUserIds">>({
+  const [values, setValues] = React.useState<
+    Omit<TripFormDto, "assignedUserIds">
+  >({
     city: initialData?.city || "",
     startDate: formatDateForInput(initialData?.startDate),
     endDate: formatDateForInput(initialData?.endDate),
     project: initialData?.project || "",
     notes: initialData?.notes || "",
+    numberInvoice: initialData?.numberInvoice || "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setValues((prev) => ({ ...prev, [name]: value }));
   };
@@ -73,13 +96,24 @@ export default function TripForm({ initialData, onSubmit, onCancel }: TripFormPr
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="city">Ciudad *</Label>
-          <Input
-            id="city"
-            name="city"
+          <Select
             value={values.city}
-            onChange={handleChange}
+            onValueChange={(value) =>
+              setValues((prev) => ({ ...prev, city: value }))
+            }
             required
-          />
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecciona una ciudad..." />
+            </SelectTrigger>
+            <SelectContent>
+              {CIUDADES.map((ciudad) => (
+                <SelectItem key={ciudad} value={ciudad}>
+                  {ciudad}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label htmlFor="project">Proyecto</Label>
@@ -115,6 +149,19 @@ export default function TripForm({ initialData, onSubmit, onCancel }: TripFormPr
             required
           />
         </div>
+      </div>
+      <div>
+        <Label htmlFor="numberInvoice">Nº Factura Interno (Financiero)</Label>
+        <Input
+          id="numberInvoice"
+          name="numberInvoice"
+          value={values.numberInvoice || ""}
+          onChange={handleChange}
+          placeholder="Número de factura generado por el sistema contable..."
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          Campo opcional para referencia del departamento financiero
+        </p>
       </div>
 
       {/* ✅ NUEVO: Selector de usuarios */}

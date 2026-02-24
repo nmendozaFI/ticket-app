@@ -991,6 +991,7 @@ export const TripScalarFieldEnum = {
   notes: 'notes',
   status: 'status',
   totalAmount: 'totalAmount',
+  numberInvoice: 'numberInvoice',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

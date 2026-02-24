@@ -40,10 +40,10 @@ const SUBCUENTAS: Record<string, { cuenta: string; concepto: string; subconcepto
     concepto: "Avion",
     subconcepto: "Avion",
   },
-  Billete: {
-    cuenta: "GASTOS DE VIAJE",
-    concepto: "Billete viajes",
-    subconcepto: "Billete viajes",
+  ComidasOficina: {
+    cuenta: "FUNCIONAMIENTO OFICINA",
+    concepto: "Comidas oficina",
+    subconcepto: "Comidas oficina",
   },
 };
 
@@ -55,7 +55,7 @@ const SUBCUENTAS_CONTABILIDAD: Record<string, string> = {
   Gasolina: "62900000031",
   Ave: "62900000025",
   Avion: "62900000038",
-  Billete: "62900000025",
+  ComidasOficina: "62900000022",
 };
 
 const BANCOS: Record<string, string> = {
@@ -104,8 +104,10 @@ export async function GET() {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("Mis Gastos");
 
+ // ✅ Orden correcto de columnas
   worksheet.columns = [
     { header: "fecha",                 key: "fecha",                 width: 12 },
+    { header: "MÉTODO DE PAGO",        key: "metodoPago",            width: 25 },
     { header: "CUENTA",                key: "cuenta",                width: 20 },
     { header: "CONCEPTO",              key: "concepto",              width: 25 },
     { header: "SUBCONCEPTO",           key: "subconcepto",           width: 25 },
@@ -116,7 +118,8 @@ export async function GET() {
     { header: "IMPORTE_TOTAL",         key: "importeTotal",          width: 15 },
     { header: "subcuenta contabildad", key: "subcuentaContabilidad", width: 20 },
     { header: "PROVEEDOR",             key: "proveedor",             width: 30 },
-    { header: "FACTURA",               key: "factura",               width: 20 },
+    { header: "NIF/CIF",               key: "nifcif",                width: 15 },
+    { header: "Nº FACTURA",            key: "factura",               width: 20 },
     { header: "COMENTARIOS",           key: "comentarios",           width: 60 },
     { header: "MES",                   key: "mes",                   width: 8  },
     { header: "Cobro",                 key: "cobro",                 width: 8  },
@@ -133,8 +136,7 @@ export async function GET() {
     { header: "CIUDAD",                key: "ciudad",                width: 15 },
     { header: "Certificado",           key: "certificado",           width: 12 },
     { header: "Liberalidad/Donación",  key: "liberalidad",           width: 20 },
-    { header: "Certificado + Carta",   key: "certificadoCarta",      width: 20 },
-    { header: "Banco",                 key: "banco",                 width: 25 },
+    { header: "Certificado + Carta",   key: "certificadoCarta",      width: 20 },  
     { header: "Prespuesto",            key: "presupuesto",           width: 12 },
     { header: "CRM",                   key: "crm",                   width: 10 },
     { header: "CRM PROYECTO",          key: "crmProyecto",           width: 15 },
@@ -153,6 +155,7 @@ export async function GET() {
 
     worksheet.addRow({
       fecha:                 formatDate(expense.date),
+      metodoPago:            BANCOS[expense.paymentMethod ?? "Tarjeta"] ?? BANCOS["Tarjeta"],
       cuenta:                categoriaInfo.cuenta,
       concepto:              categoriaInfo.concepto,
       subconcepto:           categoriaInfo.subconcepto,
@@ -163,7 +166,8 @@ export async function GET() {
       importeTotal:          Number(expense.amount),
       subcuentaContabilidad: SUBCUENTAS_CONTABILIDAD[expense.category ?? ""] ?? "",
       proveedor:             expense.vendor ?? "",
-      factura:               expense.invoiceNumber ?? "",
+      nifcif:                expense.invoiceNumber ?? "",
+      factura:               trip.numberInvoice ?? "",
       comentarios:           `Gastos de viaje ${trip.city} ${formatDate(trip.startDate)}, ${formatDate(trip.endDate)} ${userName}${trip.project ? ` – ${trip.project}` : ""}`,
       mes:                   mesNum,
       cobro:                 añoGasto,
@@ -181,7 +185,6 @@ export async function GET() {
       certificado:           "",
       liberalidad:           "",
       certificadoCarta:      "",
-      banco:                 BANCOS[expense.paymentMethod ?? "Tarjeta"] ?? BANCOS["Tarjeta"],
       presupuesto:           "",
       crm:                   "",
       crmProyecto:           "",

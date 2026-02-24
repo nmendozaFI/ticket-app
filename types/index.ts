@@ -30,6 +30,7 @@ export interface Trip {
   notes?: string | null;
   status: TripStatus;
   totalAmount: number;
+  numberInvoice?: string ;
   createdAt: Date;
   updatedAt: Date;
   assignedUsers?: TripAssignment[] // ✅ NUEVO (reemplaza a user)
@@ -43,6 +44,7 @@ export interface CreateTripDto {
   endDate: Date;
   project?: string;
   notes?: string;
+  numberInvoice?: string;
   assignedUserIds: string[]        // ✅ NUEVO: uno o varios usuarios
 }
 
@@ -53,6 +55,7 @@ export interface UpdateTripDto {
   project?: string;
   notes?: string;
   status?: TripStatus;
+  numberInvoice?: string ;
   assignedUserIds?: string[]       // ✅ NUEVO
 }
 
@@ -62,6 +65,7 @@ export interface TripFormDto {
   endDate: string;
   project?: string;
   notes?: string;
+  numberInvoice?: string ;
   assignedUserIds: string[]        // ✅ NUEVO
 }
 

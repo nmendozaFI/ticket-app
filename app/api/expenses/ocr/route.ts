@@ -52,12 +52,14 @@ export async function POST(request: NextRequest) {
   "vendor": "nombre del establecimiento/proveedor",
   "amount": número (solo el monto total, sin símbolos),
   "date": "YYYY-MM-DD" (fecha del ticket),
-  "invoiceNumber": "número de factura o ticket",
+  "invoiceNumber": "NIF o CIF de la empresa (busca en la parte superior del ticket, cerca del nombre de la empresa)",
   "category": "una de estas opciones: Taxi, Comida, Hotel, Metrobus/Parking, Gasolina",
   "description": "descripción breve de los items"
 }
 
 IMPORTANTE:
+- Para invoiceNumber, busca el NIF o CIF de la empresa emisora del ticket (formatos como: A12345678, B87654321, 12345678A, etc.) 
+- El NIF/CIF suele estar en la cabecera del ticket, cerca del nombre de la empresa o razón social 
 - Para category, elige la más apropiada según el tipo de establecimiento
 - Si no encuentras algún dato, usa null
 - El amount debe ser un número sin símbolos de moneda
