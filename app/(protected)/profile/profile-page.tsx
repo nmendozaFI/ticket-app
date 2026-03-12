@@ -1,5 +1,6 @@
 "use client";
 import { signOut } from "@/actions/auth-actions";
+import SharePointMigration from "@/components/admin/SharePointMigration";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -78,22 +79,13 @@ export default function ProfilePage({ session }: { session: Session }) {
               </div>
             </div>
 
-            {/* {user.role === "ADMIN" && (
+            {user.role === "ADMIN" && (
               <div className="mt-8 p-6 bg-gray-50 rounded-lg">
                 <div className="flex flex-wrap gap-3">
-                  <Button
-                    variant="outline"
-                    asChild
-                    className="w-full bg-transparent"
-                  >
-                    <Link href="/admin">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Configuraciones
-                    </Link>
-                  </Button>
+                  <SharePointMigration />
                 </div>
               </div>
-            )} */}
+            )} 
 
             {/* Navigation */}
             <div className="mt-8 pt-6 border-t border-gray-200">

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@tanstack/react-query": "^5.90.21",
@@ -19,6 +20,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^17.2.4",
     "exceljs": "^4.4.0",
+    "isomorphic-fetch": "^3.0.0",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
     "pg": "^8.18.0",
@@ -31,6 +33,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/microsoft-graph": "^2.40.1",
     "@types/node": "^20",
     "@types/pg": "^8.16.0",
     "@types/react": "^19",

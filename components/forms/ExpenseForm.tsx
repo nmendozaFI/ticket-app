@@ -15,8 +15,7 @@ import {
 import { Label } from "../ui/label";
 import { useOCR, useUploadReceipt } from "@/hooks/useOCR";
 import { toast } from "sonner";
-import Image from "next/image";
-import { Camera, ExternalLink, Loader2, X } from "lucide-react";
+import { ImageCapture } from "./ImageCapture"; // ✅ nuevo componente
 
 type ExpenseFormValues = {
   date: Date;
@@ -24,8 +23,8 @@ type ExpenseFormValues = {
   category?: string;
   vendor?: string;
   description?: string;
-  invoiceNumber?: string; // ✅ NUEVO
-  paymentMethod?: string; // ✅ NUEVO
+  invoiceNumber?: string;
+  paymentMethod?: string;
   receiptUrl?: string;
 };
 
@@ -44,8 +43,7 @@ export default function ExpenseForm({
 }: ExpenseFormProps) {
   const ocrMutation = useOCR();
   const uploadMutation = useUploadReceipt();
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-  // ✅ Estado separado para preview y URL guardada
+
   const [receiptUrl, setReceiptUrl] = React.useState<string>(
     initialData?.receiptUrl || "",
   );
@@ -74,45 +72,36 @@ export default function ExpenseForm({
     }));
   }
 
-  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validar tipo de archivo
+  // ✅ Callback que recibe el File ya validado desde ImageCapture
+  async function handleFileSelected(file: File) {
+    // Validar tipo
     if (!file.type.startsWith("image/")) {
       toast.error("Por favor selecciona una imagen válida");
       return;
     }
-
     // Validar tamaño (máx 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("La imagen no debe superar los 5MB");
       return;
     }
 
-    // Mostrar preview
+    // Preview local inmediato
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewUrl(reader.result as string);
-    };
+    reader.onloadend = () => setPreviewUrl(reader.result as string);
     reader.readAsDataURL(file);
 
     try {
-      // 1. Procesar OCR
       toast.info("Extrayendo datos del ticket");
 
-      const ocrData = await ocrMutation.mutateAsync(file);
+      // OCR y subida en paralelo para mayor velocidad
+      const [ocrData, imageUrl] = await Promise.all([
+        ocrMutation.mutateAsync(file),
+        uploadMutation.mutateAsync({ image: file, tripId }),
+      ]);
 
-      // 2. Subir imagen a Cloudinary
-      const imageUrl = await uploadMutation.mutateAsync({
-        image: file,
-        tripId,
-      });
-      // 3. Actualizar estados
       setReceiptUrl(imageUrl);
       setPreviewUrl(imageUrl);
 
-      // 3. Actualizar formulario con datos extraídos
       setValues((prev) => ({
         ...prev,
         vendor: ocrData.vendor || prev.vendor,
@@ -135,104 +124,26 @@ export default function ExpenseForm({
     setPreviewUrl(null);
     setReceiptUrl("");
     setValues((prev) => ({ ...prev, receiptUrl: "" }));
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onSubmit({
-      ...values,
-      receiptUrl: receiptUrl,
-    });
+    onSubmit({ ...values, receiptUrl });
   }
 
   const isProcessing = ocrMutation.isPending || uploadMutation.isPending;
 
   return (
     <form className="space-y-3" onSubmit={handleSubmit}>
-      {/* ✅ SECCIÓN DE CAPTURA DE TICKET */}
-      <div className="border-2 border-dashed rounded-lg p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <Label className="text-base font-semibold">Escanear Ticket</Label>
-            <p className="text-sm text-muted-foreground">
-              Sube una foto del recibo para autocompletar
-            </p>
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isProcessing}
-          >
-            {isProcessing ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Procesando...
-              </>
-            ) : (
-              <>
-                <Camera className="w-4 h-4 mr-2" />
-                {previewUrl ? "Cambiar Foto" : "Subir Foto"}
-              </>
-            )}
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="hidden"
-          />
-        </div>
+      {/* ✅ Componente de captura extraído */}
+      <ImageCapture
+        previewUrl={previewUrl}
+        receiptUrl={receiptUrl}
+        isProcessing={isProcessing}
+        onFileSelected={handleFileSelected}
+        onRemove={handleRemoveImage}
+      />
 
-        {previewUrl && (
-          <div className="space-y-2">
-            <div className="relative w-full h-64 rounded-lg overflow-hidden border bg-muted">
-              <Image
-                src={previewUrl}
-                alt="Recibo"
-                fill
-                sizes="s"
-                className="object-contain"
-                unoptimized={!previewUrl.startsWith("http")} // ✅ Solo optimizar URLs de Cloudinary
-              />
-            </div>
-            <div className="flex gap-2">
-              {receiptUrl && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  asChild
-                >
-                  <a
-                    href={receiptUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Ver Original
-                  </a>
-                </Button>
-              )}
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={handleRemoveImage}
-              >
-                <X className="w-4 h-4 mr-2" />
-                Eliminar
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div>
           <label className="text-sm font-medium">Fecha</label>
@@ -295,6 +206,7 @@ export default function ExpenseForm({
           />
         </div>
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="invoiceNumber">NIF/CIF</Label>
