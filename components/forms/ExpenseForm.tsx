@@ -15,7 +15,8 @@ import {
 import { Label } from "../ui/label";
 import { useOCR, useUploadReceipt } from "@/hooks/useOCR";
 import { toast } from "sonner";
-import { ImageCapture } from "./ImageCapture"; // ✅ nuevo componente
+import { Loader2 } from "lucide-react";
+import { ImageCapture } from "./ImageCapture"; 
 
 type ExpenseFormValues = {
   date: Date;
@@ -50,6 +51,12 @@ export default function ExpenseForm({
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(
     initialData?.receiptUrl || null,
   );
+  // ✅ Estado string separado para el input de monto — permite borrar y escribir libremente
+  const [amountRaw, setAmountRaw] = React.useState<string>(
+    initialData ? String(Number(initialData.amount)) : "",
+  );
+  // ✅ Estado para bloquear el botón de submit mientras se guarda
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const [values, setValues] = React.useState<ExpenseFormValues>({
     date: initialData ? new Date(initialData.date) : new Date(),
@@ -112,6 +119,8 @@ export default function ExpenseForm({
         description: ocrData.description || prev.description,
         receiptUrl: imageUrl,
       }));
+      // ✅ Sincronizar también el string visible del input de monto
+      if (ocrData.amount) setAmountRaw(String(ocrData.amount));
 
       toast.success("Datos extraídos correctamente. Revisa y confirma.");
     } catch (error) {
@@ -128,7 +137,20 @@ export default function ExpenseForm({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onSubmit({ ...values, receiptUrl });
+    // Validar que el monto sea un número válido > 0
+    const parsedAmount = parseFloat(amountRaw);
+    if (!amountRaw || isNaN(parsedAmount) || parsedAmount <= 0) {
+      toast.error("Introduce un monto válido");
+      return;
+    }
+    if (isSubmitting) return; // guardia extra contra doble tap
+    setIsSubmitting(true);
+    try {
+      onSubmit({ ...values, amount: parsedAmount, receiptUrl });
+    } finally {
+      // El padre cierra el modal; si no lo hace, desbloqueamos tras 3s
+      setTimeout(() => setIsSubmitting(false), 3000);
+    }
   }
 
   const isProcessing = ocrMutation.isPending || uploadMutation.isPending;
@@ -158,13 +180,24 @@ export default function ExpenseForm({
         </div>
         <div>
           <label className="text-sm font-medium">Monto</label>
+          {/* ✅ type="text" + inputMode="decimal" → teclado numérico en móvil,
+              sin el comportamiento raro del type="number" (no se puede borrar el 0).
+              El valor se convierte a number en handleSubmit. */}
           <Input
-            type="number"
+            type="text"
+            inputMode="decimal"
             name="amount"
-            value={values.amount}
-            onChange={handleChange}
-            step="0.01"
-            min={1}
+            value={amountRaw}
+            onChange={(e) => {
+              // Permitir solo números y un punto decimal
+              const val = e.target.value.replace(/[^0-9.]/g, "");
+              setAmountRaw(val);
+              const parsed = parseFloat(val);
+              if (!isNaN(parsed)) {
+                setValues((prev) => ({ ...prev, amount: parsed }));
+              }
+            }}
+            placeholder="0.00"
             required
           />
         </div>
@@ -256,11 +289,23 @@ export default function ExpenseForm({
       </div>
 
       <div className="flex justify-end gap-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isSubmitting}
+        >
           Cancelar
         </Button>
-        <Button type="submit" disabled={isProcessing}>
-          {initialData ? "Actualizar" : "Guardar"} Gasto
+        <Button type="submit" disabled={isProcessing || isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Guardando...
+            </>
+          ) : (
+            <>{initialData ? "Actualizar" : "Guardar"} Gasto</>
+          )}
         </Button>
       </div>
     </form>
