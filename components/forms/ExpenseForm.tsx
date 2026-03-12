@@ -16,7 +16,7 @@ import { Label } from "../ui/label";
 import { useOCR, useUploadReceipt } from "@/hooks/useOCR";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { ImageCapture } from "./ImageCapture"; 
+import { ImageCapture } from "./ImageCapture"; // ✅ nuevo componente
 
 type ExpenseFormValues = {
   date: Date;
@@ -138,7 +138,7 @@ export default function ExpenseForm({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     // Validar que el monto sea un número válido > 0
-    const parsedAmount = parseFloat(amountRaw);
+    const parsedAmount = parseFloat(amountRaw.replace(",", "."));
     if (!amountRaw || isNaN(parsedAmount) || parsedAmount <= 0) {
       toast.error("Introduce un monto válido");
       return;
@@ -189,10 +189,12 @@ export default function ExpenseForm({
             name="amount"
             value={amountRaw}
             onChange={(e) => {
-              // Permitir solo números y un punto decimal
-              const val = e.target.value.replace(/[^0-9.]/g, "");
-              setAmountRaw(val);
-              const parsed = parseFloat(val);
+              // Aceptar tanto "," como "." como separador decimal (locale móvil ES/LA)
+              const raw = e.target.value.replace(/[^0-9.,]/g, "");
+              setAmountRaw(raw);
+              // Normalizar a punto para parseFloat
+              const normalized = raw.replace(",", ".");
+              const parsed = parseFloat(normalized);
               if (!isNaN(parsed)) {
                 setValues((prev) => ({ ...prev, amount: parsed }));
               }
