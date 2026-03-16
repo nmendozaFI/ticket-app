@@ -14,5 +14,5 @@ export default async function Home() {
   if (session.user.role === "ADMIN") {
     redirect("/admin/dashboard")
   }
-  redirect("/dashboard")
+  redirect("/trips")
 }

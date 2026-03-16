@@ -23,7 +23,7 @@ export default function Navigation() {
             className="flex items-center space-x-3"
           >
             <img src="/logo.png" alt="Logo" width={64} height={64} />
-            <span className="text-md font-bold text-gray-900">Ticket app</span>
+            <span className="text-md font-bold text-gray-900">Inicio</span>
           </Link>
 
           <nav className="flex items-center space-x-6">

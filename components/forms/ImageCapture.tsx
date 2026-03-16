@@ -198,7 +198,7 @@ export function ImageCapture({
               className="w-full flex items-center gap-4 p-4 rounded-xl border hover:bg-accent transition-colors text-left"
               onClick={() => cameraInputRef.current?.click()}
             >
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                 <Camera className="w-5 h-5 text-primary" />
               </div>
               <div>
@@ -215,7 +215,7 @@ export function ImageCapture({
               className="w-full flex items-center gap-4 p-4 rounded-xl border hover:bg-accent transition-colors text-left"
               onClick={() => galleryInputRef.current?.click()}
             >
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                 <ImageIcon className="w-5 h-5 text-primary" />
               </div>
               <div>
