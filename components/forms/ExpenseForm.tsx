@@ -116,7 +116,6 @@ export default function ExpenseForm({
         date: ocrData.date ? new Date(ocrData.date) : prev.date,
         invoiceNumber: ocrData.invoiceNumber || prev.invoiceNumber,
         category: ocrData.category || prev.category,
-        description: ocrData.description || prev.description,
         receiptUrl: imageUrl,
       }));
       // ✅ Sincronizar también el string visible del input de monto
@@ -274,6 +273,7 @@ export default function ExpenseForm({
               <SelectItem value="Domiciliacion">
                 Santander domiciliacion
               </SelectItem>
+              <SelectItem value="Bankinter">Bankinter</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -54,7 +54,6 @@ export async function POST(request: NextRequest) {
   "date": "YYYY-MM-DD" (fecha del ticket),
   "invoiceNumber": "NIF o CIF de la empresa (busca en la parte superior del ticket, cerca del nombre de la empresa)",
   "category": "una de estas opciones: Taxi, Comida, Hotel, Metrobus/Parking, Gasolina",
-  "description": "descripción breve de los items"
 }
 
 IMPORTANTE:
