@@ -1,5 +1,5 @@
 import type React from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { auth } from "@/lib/auth";
@@ -9,6 +9,7 @@ import { UserProvider } from "@/context/userContext";
 import Navigation from "@/components/Navigation";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { ServiceWorkerRegister } from "@/components/service-worker-register";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,8 +22,51 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ticketing App",
+  title: {
+    default: "Ticketing App",
+    template: "%s | Ticketing App",
+  },
   description: "Control de gastos en viajes",
+  applicationName: "Ticketing App",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Ticketing App",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      {
+        url: "/icons/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
+};
+
+// En Next.js 16, themeColor y viewport van en un export separado
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#2563eb" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover", // para iPhones con notch
 };
 
 const isValidUserRole = (role: string | undefined | null): role is UserRole => {
@@ -42,7 +86,7 @@ export default async function RootLayout({
   let currentUser: User | null = null;
 
   if (session?.user) {
-    const sessionUserRole = session.user.role; 
+    const sessionUserRole = session.user.role;
 
     if (isValidUserRole(sessionUserRole)) {
       currentUser = {
@@ -68,6 +112,7 @@ export default async function RootLayout({
           </QueryProvider>
         </UserProvider>
         <Toaster position="bottom-center" richColors />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
