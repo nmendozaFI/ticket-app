@@ -1,6 +1,7 @@
 "use client";
 import { signOut } from "@/actions/auth-actions";
 import SharePointMigration from "@/components/admin/SharePointMigration";
+import { PWAInstallSection } from "@/components/pwa-install-section";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -75,6 +76,9 @@ export default function ProfilePage({ session }: { session: Session }) {
                   <span className="ml-2 text-red-600">
                     {user.emailVerified ? "Yes" : "No"}
                   </span>
+                </div>
+                <div>
+                  <PWAInstallSection />
                 </div>
               </div>
             </div>
