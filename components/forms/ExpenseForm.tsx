@@ -17,6 +17,7 @@ import { useOCR, useUploadReceipt } from "@/hooks/useOCR";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { ImageCapture } from "./ImageCapture"; // ✅ nuevo componente
+import { compressImage } from "@/lib/compress-image";
 
 type ExpenseFormValues = {
   date: Date;
@@ -79,31 +80,49 @@ export default function ExpenseForm({
     }));
   }
 
-  // ✅ Callback que recibe el File ya validado desde ImageCapture
+  /**
+   * Maneja la selección de un archivo de ticket desde ImageCapture.
+   * Flujo:
+   *   1. Validar tipo y tamaño RAW (antes de comprimir)
+   *   2. Comprimir → JPEG ~600KB
+   *   3. Mostrar preview inmediato
+   *   4. OCR + upload a Cloudinary en paralelo
+   *   5. Rellenar campos con los datos extraídos
+   * Manejo de errores:
+   *   - Validación falla → toast + return (sin throw)
+   *   - Compresión falla → toast + return (atrapado por try/catch global)
+   *   - OCR/upload falla → toast + return (atrapado por try/catch global)
+   */
   async function handleFileSelected(file: File) {
-    // Validar tipo
+    // 1️⃣ Validación PREVIA (antes de gastar CPU comprimiendo)
     if (!file.type.startsWith("image/")) {
       toast.error("Por favor selecciona una imagen válida");
       return;
     }
-    // Validar tamaño (máx 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("La imagen no debe superar los 5MB");
+
+    // Límite generoso pre-compresión: 25MB cubre cualquier foto de móvil moderno.
+    // Si supera esto, probablemente sea un vídeo seleccionado por error.
+    if (file.size > 25 * 1024 * 1024) {
+      toast.error("La imagen es demasiado grande (máx 25MB)");
       return;
     }
 
-    // Preview local inmediato
-    const reader = new FileReader();
-    reader.onloadend = () => setPreviewUrl(reader.result as string);
-    reader.readAsDataURL(file);
-
+    // 2️⃣ Todo el flujo en un solo try/catch — más predecible
     try {
+      // Comprimir antes de cualquier otra cosa
+      const compressed = await compressImage(file);
+
+      // Preview local inmediato (mientras OCR y upload procesan en paralelo)
+      const reader = new FileReader();
+      reader.onloadend = () => setPreviewUrl(reader.result as string);
+      reader.readAsDataURL(compressed);
+
       toast.info("Extrayendo datos del ticket");
 
-      // OCR y subida en paralelo para mayor velocidad
+      // OCR y upload en paralelo
       const [ocrData, imageUrl] = await Promise.all([
-        ocrMutation.mutateAsync(file),
-        uploadMutation.mutateAsync({ image: file, tripId }),
+        ocrMutation.mutateAsync(compressed),
+        uploadMutation.mutateAsync({ image: compressed, tripId }),
       ]);
 
       setReceiptUrl(imageUrl);
@@ -118,13 +137,27 @@ export default function ExpenseForm({
         category: ocrData.category || prev.category,
         receiptUrl: imageUrl,
       }));
-      // ✅ Sincronizar también el string visible del input de monto
+
+      // Sincronizar el string visible del input de monto
       if (ocrData.amount) setAmountRaw(String(ocrData.amount));
 
       toast.success("Datos extraídos correctamente. Revisa y confirma.");
     } catch (error) {
-      console.error("Error processing receipt:", error);
-      toast.error("No se pudo procesar el ticket. Intenta nuevamente.");
+      console.error("Error procesando ticket:", error);
+
+      // Mensaje específico para errores conocidos
+      if (error instanceof Error) {
+        // Compresión: el error trae mensaje útil (ej: "Tu navegador no puede procesar fotos HEIC...")
+        if (
+          error.message.includes("HEIC") ||
+          error.message.includes("imagen")
+        ) {
+          toast.error(error.message);
+          return;
+        }
+      }
+
+      toast.error("No se pudo procesar el ticket. Inténtalo nuevamente.");
     }
   }
 

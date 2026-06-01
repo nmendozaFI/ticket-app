@@ -258,7 +258,7 @@ export default function AdminTripExpenses({
                   <TableHead>Fecha</TableHead>
                   <TableHead>Categoría</TableHead>
                   <TableHead>Proveedor</TableHead>
-                  <TableHead>Nº Factura</TableHead>
+                  <TableHead>CIF/NIF</TableHead>
                   <TableHead>Método Pago</TableHead>
                   <TableHead className="text-right">Monto</TableHead>
                   <TableHead>Descripción</TableHead>
