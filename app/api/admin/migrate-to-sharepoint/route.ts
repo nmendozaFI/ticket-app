@@ -30,9 +30,10 @@ export async function POST(request: Request) {
     const { year, month } = body; // Ejemplo: { year: 2026, month: 3 }
 
     // Si no especifican, usar el mes anterior
-    const targetDate = year && month 
-      ? new Date(year, month - 1)
-      : new Date(new Date().getFullYear(), new Date().getMonth() - 1);
+    const targetDate =
+      year && month
+        ? new Date(year, month - 1)
+        : new Date(new Date().getFullYear(), new Date().getMonth() - 1);
 
     const targetYear = targetDate.getFullYear();
     const targetMonth = String(targetDate.getMonth() + 1).padStart(2, "0");
@@ -41,9 +42,9 @@ export async function POST(request: Request) {
 
     // 1. Listar archivos en Cloudinary del mes específico
     const folderPrefix = `tickets/${targetYear}/${targetMonth}`;
-    
+
     const cloudinaryFiles = await listCloudinaryFiles(folderPrefix);
-    
+
     if (cloudinaryFiles.length === 0) {
       return NextResponse.json({
         message: "No files found for the specified period",
@@ -65,15 +66,16 @@ export async function POST(request: Request) {
         const fileBuffer = await downloadFromCloudinary(file.secure_url);
 
         // Extraer path relativo: tickets/2026/03/158/archivo.jpg → 2026/03/158
-        const pathParts = file.public_id.split("/");
-        const folderPath = pathParts.slice(1, -1).join("/"); // Quita "tickets" y el nombre de archivo
+        const pathParts = file.public_id.split("/"); // ["tickets","2026","03","158","archivo"]
+        const [, yyyy, mm, invoice] = pathParts;
+        const folderPath = `Año ${yyyy}/TICKETS VIAJES/${mm}/${invoice}`;
         const fileName = pathParts[pathParts.length - 1] + "." + file.format;
 
         // Subir a SharePoint
         const sharePointUrl = await uploadFileToSharePoint(
           fileName,
           fileBuffer,
-          folderPath
+          folderPath,
         );
 
         result.success++;
@@ -85,10 +87,9 @@ export async function POST(request: Request) {
 
         // Log en base de datos (opcional)
         await logMigration(file.public_id, sharePointUrl, "success");
-
       } catch (error: any) {
         console.error(`Error migrating ${file.public_id}:`, error);
-        
+
         result.failed++;
         result.details.push({
           file: file.public_id,
@@ -104,12 +105,11 @@ export async function POST(request: Request) {
       message: `Migration completed: ${result.success} successful, ${result.failed} failed`,
       result,
     });
-
   } catch (error: any) {
     console.error("Migration error:", error);
     return NextResponse.json(
       { error: "Migration failed", details: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -131,7 +131,7 @@ async function listCloudinaryFiles(prefix: string): Promise<any[]> {
         } else {
           resolve(result.resources);
         }
-      }
+      },
     );
   });
 }
@@ -139,7 +139,9 @@ async function listCloudinaryFiles(prefix: string): Promise<any[]> {
 async function downloadFromCloudinary(url: string): Promise<Buffer> {
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`Failed to download from Cloudinary: ${response.statusText}`);
+    throw new Error(
+      `Failed to download from Cloudinary: ${response.statusText}`,
+    );
   }
   const arrayBuffer = await response.arrayBuffer();
   return Buffer.from(arrayBuffer);
@@ -149,7 +151,7 @@ async function logMigration(
   cloudinaryId: string,
   sharePointUrl: string,
   status: string,
-  error?: string
+  error?: string,
 ): Promise<void> {
   // Opcional: crear tabla MigrationLog en Prisma para tracking
   console.log({
@@ -175,15 +177,14 @@ export async function GET() {
 
     return NextResponse.json({
       connected: isConnected,
-      message: isConnected 
-        ? "SharePoint connection OK" 
+      message: isConnected
+        ? "SharePoint connection OK"
         : "SharePoint connection failed",
     });
-
   } catch (error: any) {
     return NextResponse.json(
       { connected: false, error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
